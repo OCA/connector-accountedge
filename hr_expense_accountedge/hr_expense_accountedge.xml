@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!--
+             Expenses
+        -->
+        <record id="view_expenses_form" model="ir.ui.view">
+            <field name="name">hr.expense.form</field>
+            <field name="type">form</field>
+            <field name="model">hr.expense.expense</field>
+            <field name="inherit_id" ref="hr_expense.view_expenses_form"/>
+            <field name="arch" type="xml">
+                <field name="state" widget="statusbar" statusbar_visible="draft,confirm,accepted,exported,imported" statusbar_colors='{"confirm":"blue","cancelled":"red"}'/>
+                <group col="6" colspan="2" position="replace">
+                    <group col="5" colspan="2">
+                        <button name="draft" states="confirm,cancelled,exported,imported" string="Set to Draft" type="workflow" icon="gtk-convert" groups="base.group_hr_user"/>
+                        <button name="refuse" states="confirm,accepted" string="Refuse" type="workflow" icon="gtk-no" groups="base.group_hr_user" />
+                        <button name="confirm" states="draft" string="Submit to Manager" type="workflow" icon="gtk-apply"/>
+                        <button name="validate" states="confirm" string="Approve" type="workflow" icon="gtk-go-forward" groups="base.group_hr_user"/>
+                        <button name="action_exported" states="accepted" string="Export csv" type="workflow" groups="base.group_hr_user"/>
+                    </group>
+                </group>
+            </field>
+        </record>
+
+        <!--
+             Workflow definition
+        -->
+        <record id="hr_expense.act_exported" model="workflow.activity">
+            <field name="wkf_id" ref="hr_expense.wkf_expenses"/>
+            <field name="name">imported</field>
+            <field name="kind">function</field>
+            <field name="action">action_exported()</field>
+        </record>
+
+        <record id="t_wait_accepted_to_exported" model="workflow.transition">
+            <field name="act_from" ref="hr_expense.act_accepted"/>
+            <field name="act_to" ref="hr_expense.act_exported"/>
+            <field name="signal">action_exported</field>
+        </record>
+
+        <record id="t_exported_to_draft" model="workflow.transition">
+            <field name="act_from" ref="hr_expense.act_exported"/>
+            <field name="act_to" ref="hr_expense.act_draft"/>
+            <field name="signal">draft</field>
+            <field name="group_id" ref="base.group_hr_user"/>
+        </record>
+
+    </data>
+</openerp>

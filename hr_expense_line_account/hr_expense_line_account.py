@@ -1,0 +1,73 @@
+# -*- encoding: utf-8 -*-
+##############################################################################
+#····
+#    OpenERP, Open Source Management Solution
+#    Copyright (C) 2010 Savoir-faire Linux (<http://www.savoirfairelinux.com>).
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.·····
+#
+##############################################################################
+
+from osv import osv, fields
+
+class hr_expense_line(osv.osv):
+    _inherit = 'hr.expense.line'
+    _columns = {
+        'account_id': fields.many2one('account.account', 'Compte financier'),
+    }
+
+    def get_account_id(self, cr, uid, product_id, context=None):
+        '''
+            Get the automatic value of the account_id field.
+        '''
+        # Produit
+        product = self.pool.get('product.product').browse(cr, uid, product_id)
+        # Fiche produit -> Accounting -> Expense account
+        exp_acc = product.product_tmpl_id.property_account_expense
+        # Si le champ est vide
+        if not exp_acc:
+            # Remonter au 'Parent category'
+            parent_category = product.product_tmpl_id.categ_id
+            # Continuer tant qu'il y a un 'parent category' mais pas de 'expense account'
+            while (parent_category and not exp_acc):
+                exp_acc= parent_category.property_account_expense_categ
+
+        if exp_acc:
+            return exp_acc.id
+
+        return None
+
+
+    def create(self, cr, user, vals, context=None):
+        '''
+            Overwrite the create() function to automatically set the default account id
+            since regular employees cannot access this field.
+        '''
+        vals['account_id'] = self.get_account_id(cr, user, vals['product_id'], context)
+        return super(hr_expense_line,self).create(cr, user, vals, context)
+
+
+    def onchange_product_id(self, cr, uid, ids, product_id, uom_id, employee_id, context=None):
+        if product_id:
+            values      = super(hr_expense_line, self).onchange_product_id(cr, uid, ids, product_id, uom_id, employee_id, context=context)
+        for id in ids:
+            this        = self.browse(cr, uid, id)
+            account_id  = self.get_account_id(cr, uid, product_id, context)
+            values['value'].update({
+                'account_id' : account_id
+            })
+        return values
+
+
+hr_expense_line()
