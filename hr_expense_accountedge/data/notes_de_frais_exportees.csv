@@ -1,0 +1,7 @@
+RecordId	Date	Vendor Invoice #	Account #	Amout	Description                        	Tax Code	Tax Amount TVQ	Tax Amount TPS/TVH	Currency Code	Exchange Rate
+0704	2013-05-28	6	511	1.0	Billet d'avion	150	0.00	0.13	EUR	1.0
+0704	2013-05-28	6	511	1.0	Déplacement en voiture	000	0.00	0.00	EUR	1.0
+
+001	2013-05-27	5	511	70.0	Ice Cream	140	6.22	3.33	EUR	1.0
+001	2013-05-27	5	511	1.0	Billet d'avion	150	0.00	0.13	EUR	1.0
+

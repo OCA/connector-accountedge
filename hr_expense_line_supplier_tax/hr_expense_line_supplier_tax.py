@@ -66,10 +66,11 @@ class hr_expense_line(osv.osv):
             values  = super(hr_expense_line, self).onchange_product_id(cr, uid, ids, product_id, uom_id, employee_id, context=context)
         for id in ids:
             this    = self.browse(cr, uid, id)
-            tax_id  = self.get_tax_id(cr, uid, product_id, this.partner_id.id, context)
-            values['value'].update({
-                'tax_id' : tax_id
-            })
+            if this.name:
+                tax_id  = self.get_tax_id(cr, uid, product_id, this.partner_id.id, context)
+                values['value'].update({
+                    'tax_id' : tax_id
+                 })
         return values
 
     def onchange_partner_id(self, cr, uid, ids, partner_id, context=None):

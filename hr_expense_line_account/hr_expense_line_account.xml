@@ -17,10 +17,11 @@
             <field name="model">hr.expense.expense</field>
             <field name="inherit_id" ref="hr_expense.view_expenses_form"/>
             <field name="arch" type="xml">
-                <group colspan="2" col="2" position="before">
+                <field name="unit_quantity" position="after">
+                    <newline/>
                     <field name="account_id" groups="account.group_account_invoice"/>
                     <newline/>
-                </group>
+                </field>
             </field>
         </record>
     </data>

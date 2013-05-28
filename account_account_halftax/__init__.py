@@ -18,23 +18,6 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.·····
 #
 ##############################################################################
-{
-    "name" : "AccountEdge tax code",
-    "version" : "1.0",
-    "author" : "Savoir-faire Linux",
-    "website" : "http://www.savoirfairelinux.com",
-    "category" : "Human Resources",
-    "description": """
-        This module adds the AccountEdge tax code field to account.tax
-    """,
-    "depends" : ['account', 'account_accountant'],
-    "init_xml" : [],
-    "update_xml" : [
-        'account_tax_accountedge.xml',
-    ],
-    "demo_xml" : [],
-    "installable" : True,
-    "certificate" : ''
-}
+import account_account_halftax
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
 

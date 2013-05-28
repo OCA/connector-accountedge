@@ -11,6 +11,8 @@
                 </field>
             </field>
         </record>
+
+
         <record id="view_tax_form" model="ir.ui.view">
             <field name="name">account.tax.form</field>
             <field name="model">account.tax</field>
@@ -19,7 +21,12 @@
                 <field name="description" position="after">
                     <field name="tax_code_accountedge"/>
                 </field>
+
+                <tree string="Account Tax" position="replace">
+                    <field name="tax_code_accountedge"/>
+                </tree>
             </field>
         </record>
+
     </data>
 </openerp>

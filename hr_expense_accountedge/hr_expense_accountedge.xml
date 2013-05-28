@@ -17,7 +17,7 @@
                         <button name="refuse" states="confirm,accepted" string="Refuse" type="workflow" icon="gtk-no" groups="base.group_hr_user" />
                         <button name="confirm" states="draft" string="Submit to Manager" type="workflow" icon="gtk-apply"/>
                         <button name="validate" states="confirm" string="Approve" type="workflow" icon="gtk-go-forward" groups="base.group_hr_user"/>
-                        <button name="action_exported" states="accepted" string="Export csv" type="workflow" groups="base.group_hr_user"/>
+                        <button name="action_exported" states="accepted" string="Exporter le CSV" type="workflow" groups="base.group_hr_user"/>
                     </group>
                 </group>
             </field>
