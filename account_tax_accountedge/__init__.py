@@ -18,6 +18,5 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.·····
 #
 ##############################################################################
-import hr_expense_accountedge
-import edi
+import account_tax_accountedge
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
