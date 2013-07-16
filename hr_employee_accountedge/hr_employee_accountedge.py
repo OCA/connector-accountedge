@@ -24,7 +24,7 @@ from osv import fields, osv
 class hr_employee(osv.osv):
     _inherit = 'hr.employee'
     _columns = {
-        'supplier_id_accountedge': fields.char('ID du fournisseur dans AccountEdge', size=16),
+        'supplier_id_accountedge': fields.char('Supplier ID in AccountEdge', size=16),
     }
 
 hr_employee()

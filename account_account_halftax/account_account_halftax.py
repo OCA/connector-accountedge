@@ -24,7 +24,7 @@ from osv import osv, fields
 class account_account(osv.osv):
     _inherit = 'account.account'
     _columns = {
-        'tax_halftax': fields.boolean('Taxe à 50%'),
+        'tax_halftax': fields.boolean('Divide tax by 2'),
     }
 
 account_account()

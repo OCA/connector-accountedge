@@ -19,4 +19,5 @@
 #
 ##############################################################################
 import hr_expense_accountedge
+import edi
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

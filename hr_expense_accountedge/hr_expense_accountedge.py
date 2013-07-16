@@ -15,7 +15,7 @@
 #    GNU General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.·····
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
 
@@ -23,6 +23,7 @@ import time
 import base64
 
 from osv import osv, fields
+from datetime import datetime
 
 
 class hr_expense_expense(osv.osv):
@@ -37,25 +38,26 @@ class hr_expense_expense(osv.osv):
 
             output  = this.employee_id.name
             output += "\r\n"
-            output += "RecordId\tDate\tVendor Invoice #\tAccount #\tAmout\tDescription\
-                        \tTax Code\tTax Amount TVQ\tTax Amount TPS/TVH\tCurrency Code\tExchange Rate\r\n"
+            output += "Card ID\tDate\tVendor Invoice #\tAccount Number\tAmount\tDescription\
+                        \tGST Amount\tPST/QST Amount\tCurrency Code\tExchange Rate\r\n"
+
 
             for l in this.line_ids:
-                output  += u"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%.2f\t%.2f\t%s\t%s\r\n" % (
+                taxes = self._compute_taxes(cr,uid,l,context)
+                output  += u"%s\t%s\t%s\t%s\t%.2f\t%s\t%.2f\t%.2f\t%s\t%.2f\r\n" % (
                         this.employee_id.supplier_id_accountedge,
-                        l.date_value,
+                        datetime.strptime(l.date_value,"%Y-%m-%d").strftime("%m/%d/%Y"),
                         l.expense_id.id,
                         l.account_id.code,
-                        (l.total_amount or '0.00'),
+                        taxes['amount_before_tax'],
                         l.name,
-                        (l.tax_id.tax_code_accountedge or '000'),
-                        self._compute_TVQ(cr,uid,l,context),
-                        self._compute_TPS_TVH(cr,uid,l,context),
+                        taxes['amount_gst'],
+                        taxes['amount_pst'],
                         (l.expense_id.currency_id.name or 'CAD'),
-                        (l.expense_id.currency_id.rate or '1.0'))
-                byte_string  = output.encode('utf-8-sig')
+                        (float(l.expense_id.currency_id.rate) or '1.0'))
 
-            res[id] = base64.encodestring(byte_string)
+            byte_string = output.encode('utf-8-sig')
+            res[id]     = base64.encodestring(byte_string)
 
             self.write(cr, uid, ids, {'csv_file':res[id]}, context=context)
             self._add_attachment(cr,uid,id,byte_string,context)
@@ -63,42 +65,45 @@ class hr_expense_expense(osv.osv):
         return True
 
 
-    def _compute_TPS_TVH(self,cr,uid,expense_line,context={}):
-        tax = expense_line.tax_id
-        tax_percent = None
+    def _compute_taxes(self,cr,uid,expense_line,context={}):
 
+        res = {
+                'amount_before_tax' : expense_line.total_amount,
+                'amount_gst'        : 0.0,    # Goods and Services Tax, federal
+                'amount_pst'        : 0.0     # Provincial Sales Tax
+        }
+
+        tax = expense_line.tax_id
         if not tax.amount:
-            return 0
+            return res
 
-        if tax.tax_code_accountedge != '140':
-            # cas simple, une seule taxe
-            tax_percent = float(tax.amount)
+        # Divide tax per two?
+        tax_factor = 1.0
+        if expense_line.account_id.tax_halftax:
+            tax_factor = 0.5
+
+        if tax.child_ids :
+            for child_tax in tax.child_ids: # TODO: the detection of the two taxes should be more reliable
+                if  'TPS' in child_tax.name or \
+                    'GST' in child_tax.name:
+                    res['amount_gst'] = float(child_tax.amount) * tax_factor
+                else:
+                    res['amount_pst'] = float(child_tax.amount) * tax_factor
         else:
-            # cas TPS-TVQ, prendre la TPS
-            for child_tax in tax.child_ids:
-                if child_tax.tax_code_accountedge == '500': # TPS
-                    tax_percent = float(child_tax.amount)
-                    break;
-
-        if tax_percent:
-            amount_HT  = expense_line.total_amount / (1 + tax_percent)
-            return amount_HT * tax_percent
-        return 0
+            res['amount_gst'] = float(tax.amount)
 
 
-    def _compute_TVQ(self,cr,uid,expense_line,context={}):
-        tax = expense_line.tax_id
+        res['amount_before_tax']    = expense_line.total_amount / (1 + res['amount_gst'] + res['amount_pst'])
+        res['amount_gst']           = res['amount_before_tax'] * res['amount_gst']
+        res['amount_pst']           = res['amount_before_tax'] * res['amount_pst']
 
-        if tax.tax_code_accountedge == '140':
-            # On a la TVQ seulement dans le cas TPS+TVQ
-            for child_tax in tax.child_ids:
-                if child_tax.tax_code_accountedge != '500':
-                    # On estime que la taxe fille qui n'a pas un id de 500
-                    # est la TVQ
-                    tax_percent = float(child_tax.amount)
-                    amount_HT  = expense_line.total_amount / (1 + tax_percent)
-                    return amount_HT * tax_percent
-        return 0
+        # round up or down to make sure the original total amount is not lost
+        res['amount_gst']           = round(res['amount_gst'], 2)
+        res['amount_pst']           = round(res['amount_pst'], 2)
+        res['amount_before_tax']    = expense_line.total_amount - res['amount_gst'] - res['amount_pst']
+
+        return res
+
 
 
     def _add_attachment(self,cr,uid,ids,content,context={}):
@@ -124,7 +129,6 @@ class hr_expense_expense(osv.osv):
         # générer la note de frais
         for id in ids:
             this    = self.browse(cr, uid, id)
-
             if not this.employee_id.supplier_id_accountedge:
                 raise osv.except_osv('ID du fournisseur dans AccountEdge manquant',
                         'Veuillez ajouter ID de fournisseur AccountEdge pour dans la fiche cet employé au préalable.')
@@ -135,13 +139,49 @@ class hr_expense_expense(osv.osv):
         return True
 
 
+    def action_imported(self,cr,uid,ids,*args):
+        if not len(ids):
+            return False
+        for id in ids:
+            self.write(cr,uid,ids,{'state': 'imported'})
+        return True
+
+
+    def _get_cur_account_manager(self, cr, uid, ids, field_name, arg, context):
+        res  = {}
+        for id in ids:
+            emails = ''
+            grp_ids = self.pool.get('res.groups').search(cr, uid, [('name','=',u'Manager'),('category_id.name','=',u'Accounting & Finance')])
+            usr_ids = self.pool.get('res.users').search(cr, uid, [('groups_id','=',grp_ids[0])])
+            usrs    = self.pool.get('res.users').browse(cr, uid, usr_ids)
+
+            for user in usrs:
+                if user.user_email:
+                    emails += user.user_email
+                    emails += ','
+                else:
+                    empl_id = self.pool.get('hr.employee').search(cr, uid,[('login','=',user.login)])[0]
+                    empl    = self.pool.get('hr.employee').browse(cr, uid, empl_id)
+                    if empl.work_email:
+                        emails += empl.work_email
+                        emails += ','
+
+            emails  = emails[:-1]
+            res[id] = emails
+        return res
 
     _columns = {
-        'state': fields.selection([
+        'manager' : fields.function(
+            _get_cur_account_manager,
+            string='Manager',
+            type='char',
+            size=128,
+            readonly=True),
+        'state' : fields.selection([
             ('draft', 'New'),
             ('confirm', 'Waiting Approval'),
             ('accepted', 'Approved'),
-            ('exported', 'Exporté'),
+            ('exported', 'Exported'),
             ('imported', 'Imported'),
             ('cancelled', 'Refused'),],
             'State', readonly=True, help='When the expense request is created the state is \'Draft\'.\

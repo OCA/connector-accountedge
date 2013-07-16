@@ -64,6 +64,9 @@ class hr_expense_line(osv.osv):
     def onchange_product_id(self, cr, uid, ids, product_id, uom_id, employee_id, context=None):
         if product_id:
             values  = super(hr_expense_line, self).onchange_product_id(cr, uid, ids, product_id, uom_id, employee_id, context=context)
+        else:
+            values  = {}
+
         for id in ids:
             this    = self.browse(cr, uid, id)
             if this.name:
@@ -85,16 +88,8 @@ class hr_expense_line(osv.osv):
         return values
 
 
-    def _get_parent_state(self, cr, uid, ids, field_name, arg, context={}):
-        res = {}
-        for val in self.browse(cr, uid, ids, context=context):
-            res[val.id] = val.expense_id.state
-        return res
-
-
     _columns = {
-        'tax_id': fields.many2one('account.tax', 'Taxe', domain= [('type_tax_use', '=', 'purchase')]),
-        'parent_state' : fields.function(_get_parent_state, type='char', size=32, obj="res.partner.function", string='Expense state'),
+        'tax_id': fields.many2one('account.tax', 'Tax', domain= [('type_tax_use', '=', 'purchase')]),
     }
 
 

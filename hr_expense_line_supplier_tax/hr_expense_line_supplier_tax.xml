@@ -7,7 +7,6 @@
             <field name="inherit_id" ref="hr_expense.view_expenses_line_tree"/>
             <field name="arch" type="xml">
                 <field name="unit_amount" position="before">
-                    <field name="parent_state" invisible="1"/>
                     <field name="tax_id" groups="account.group_account_invoice"/>
                 </field>
             </field>

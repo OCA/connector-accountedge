@@ -24,24 +24,24 @@ from osv import osv, fields
 class hr_expense_line(osv.osv):
     _inherit = 'hr.expense.line'
     _columns = {
-        'account_id': fields.many2one('account.account', 'Compte financier'),
+        'account_id': fields.many2one('account.account', 'Financial Account'),
     }
 
     def get_account_id(self, cr, uid, product_id, context=None):
         '''
             Get the automatic value of the account_id field.
         '''
-        # Produit
+        # Retrieve the product
         product = self.pool.get('product.product').browse(cr, uid, product_id)
-        # Fiche produit -> Accounting -> Expense account
+        # Product -> Accounting -> Expense account
         exp_acc = product.product_tmpl_id.property_account_expense
-        # Si le champ est vide
+
+        # If the field is empty
         if not exp_acc:
-            # Remonter au 'Parent category'
+            # Fidn the product's 'Parent category'
             parent_category = product.product_tmpl_id.categ_id
-            # Continuer tant qu'il y a un 'parent category' mais pas de 'expense account'
-            while (parent_category and not exp_acc):
-                exp_acc= parent_category.property_account_expense_categ
+            # Try to find the expense account of the parent category
+            exp_acc = parent_category.property_account_expense_categ
 
         if exp_acc:
             return exp_acc.id

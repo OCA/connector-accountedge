@@ -1,6 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+        <!-- EDI Export + Send email Action  -->
+        <record id="ir_actions_server_edi_expense_approved" model="ir.actions.server">
+            <field name="code">object.edi_export_and_email(template_ext_id='hr_expense_accountedge.email_template_edi_expense_accepted', context=context)</field>
+            <field eval="6" name="sequence"/>
+            <field name="state">code</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_hr_expense_expense"/>
+            <field name="condition">True</field>
+            <field name="name">Auto-email expense approved</field>
+        </record>
+
+        <record id="ir_actions_server_edi_expense_confirm" model="ir.actions.server">
+            <field name="code">object.edi_export_and_email(template_ext_id='hr_expense_accountedge.email_template_edi_expense_waiting_approval', context=context)</field>
+            <field eval="6" name="sequence"/>
+            <field name="state">code</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_hr_expense_expense"/>
+            <field name="condition">True</field>
+            <field name="name">Auto-email expense waiting for approval</field>
+        </record>
+
+
+        <!-- EDI related Email Templates menu (HR -> Configuration -> Email Templates) -->
+        <record model="ir.actions.act_window" id="action_email_templates_expenses">
+            <field name="name">Email Templates</field>
+            <field name="res_model">email.template</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="email_template.email_template_tree" />
+            <field name="search_view_id" ref="email_template.view_email_template_search"/>
+            <field name="context">{'search_default_model_id':'hr.expense.expense'}</field>
+            <field name="context" eval="{'search_default_model_id': ref('model_hr_expense_expense')}"/>
+        </record>
+        <menuitem id="menu_email_templates_expenses" parent="hr.menu_hr_configuration" action="action_email_templates_expenses" sequence="30"/>
+
+    </data>
+
+    <data noupdate="1">
         <!--
              Expenses
         -->
@@ -10,14 +48,21 @@
             <field name="model">hr.expense.expense</field>
             <field name="inherit_id" ref="hr_expense.view_expenses_form"/>
             <field name="arch" type="xml">
-                <field name="state" widget="statusbar" statusbar_visible="draft,confirm,accepted,exported,imported" statusbar_colors='{"confirm":"blue","cancelled":"red"}'/>
+                <group col="6" colspan="4" position="after">
+                    <newline/>
+                    <field name="manager"/>
+                </group>
+                <field name="state"  position="replace">
+                     <field name="state" widget="statusbar" statusbar_visible="draft,confirm,accepted,exported,imported" statusbar_colors='{"confirm":"blue","cancelled":"red"}'/>
+                </field>
                 <group col="6" colspan="2" position="replace">
-                    <group col="5" colspan="2">
-                        <button name="draft" states="confirm,cancelled,exported,imported" string="Set to Draft" type="workflow" icon="gtk-convert" groups="base.group_hr_user"/>
+                    <group col="6" colspan="2">
+                        <button name="draft" states="confirm,cancelled,exported" string="Set to Draft" type="workflow" icon="gtk-convert" groups="base.group_hr_user"/>
                         <button name="refuse" states="confirm,accepted" string="Refuse" type="workflow" icon="gtk-no" groups="base.group_hr_user" />
                         <button name="confirm" states="draft" string="Submit to Manager" type="workflow" icon="gtk-apply"/>
                         <button name="validate" states="confirm" string="Approve" type="workflow" icon="gtk-go-forward" groups="base.group_hr_user"/>
-                        <button name="action_exported" states="accepted" string="Exporter le CSV" type="workflow" groups="base.group_hr_user"/>
+                        <button name="action_exported" states="accepted" string="Export CSV" type="workflow" groups="account.group_account_manager"/>
+                        <button name="action_imported" states="exported" confirm="This action cannot be undone" string="Mark as imported" type="workflow" groups="account.group_account_manager"/>
                     </group>
                 </group>
             </field>
@@ -26,17 +71,35 @@
         <!--
              Workflow definition
         -->
+
+        <record id="hr_expense.act_confirm" model="workflow.activity">
+            <field name="action_id" ref="ir_actions_server_edi_expense_confirm"/>
+        </record>
+
+        <record id="hr_expense.act_accepted" model="workflow.activity">
+            <field name="action_id" ref="ir_actions_server_edi_expense_approved"/>
+        </record>
+
         <record id="hr_expense.act_exported" model="workflow.activity">
             <field name="wkf_id" ref="hr_expense.wkf_expenses"/>
-            <field name="name">imported</field>
+            <field name="name">exported</field>
             <field name="kind">function</field>
             <field name="action">action_exported()</field>
         </record>
+
+        <record id="hr_expense.act_imported" model="workflow.activity">
+            <field name="wkf_id" ref="hr_expense.wkf_expenses"/>
+            <field name="name">imported</field>
+            <field name="kind">function</field>
+            <field name="action">action_imported()</field>
+        </record>
+
 
         <record id="t_wait_accepted_to_exported" model="workflow.transition">
             <field name="act_from" ref="hr_expense.act_accepted"/>
             <field name="act_to" ref="hr_expense.act_exported"/>
             <field name="signal">action_exported</field>
+            <field name="group_id" ref="base.group_hr_user"/>
         </record>
 
         <record id="t_exported_to_draft" model="workflow.transition">
@@ -44,6 +107,110 @@
             <field name="act_to" ref="hr_expense.act_draft"/>
             <field name="signal">draft</field>
             <field name="group_id" ref="base.group_hr_user"/>
+        </record>
+
+        <record id="t_exported_to_imported" model="workflow.transition">
+            <field name="act_from" ref="hr_expense.act_exported"/>
+            <field name="act_to" ref="hr_expense.act_imported"/>
+            <field name="signal">action_imported</field>
+            <field name="group_id" ref="base.group_hr_user"/>
+        </record>
+
+
+
+        <!--
+             Email template for expensed that are waiting for approval
+        -->
+        <record id="email_template_edi_expense_waiting_approval" model="email.template">
+            <field name="name">Automated Invoice Notification Mail</field>
+            <field name="email_from">${object.company_id.email or 'noreply@localhost'}</field>
+            <field name="subject">New expense waiting for approval</field>
+            <field name="email_to">${object.employee_id.parent_id.work_email or 'naysan.saran@gmail.com'}</field>
+            <field name="model_id" ref="model_hr_expense_expense"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.employee_id.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+                <div style="
+                    font-family     : 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif;
+                    font-size       : 12px;
+                    color           : rgb(34, 34, 34);
+                    background-color: #FFF;
+                    ">
+
+                    <p>Hello,</p>
+                    <p>A new expense is waiting for approval. </p>
+                    ${'<br/>'.join(ctx.keys())}
+                    <br/>
+                    <p>You can view the expense using the following link: </p>
+                    <a style="
+                        display:block; width: 150px; height:20px;
+                        margin-left: 20px; color: #DDD;
+                        font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
+                        font-size: 13px; font-weight: bold; text-align: center;
+                        text-decoration: none !important; line-height: 1;
+                        padding: 5px 0px 0px 0px; background-color: #8E0000;
+                        border-radius: 5px 5px; background-repeat: repeat no-repeat;"
+
+                        href="${ctx.get('edi_web_url_view') or ''}">
+                        View Expense
+                    </a>
+                    <br/>
+                </div>
+            ]]></field>
+            <field name="body_text"><![CDATA[
+                Hello,
+                A new expense is waiting for approval.
+                You can view the expense using the following link:
+                ${ctx.get('url') or 'n/a'}
+            ]]></field>
+        </record>
+
+
+        <!--
+             Email template for approved expenses, asking the account manager to export the expense
+        -->
+        <record id="email_template_edi_expense_accepted" model="email.template">
+            <field name="name">Automated Invoice Notification Mail</field>
+            <field name="email_from">${object.company_id.email or 'noreply@localhost'}</field>
+            <field name="subject">New expense approved and ready for export</field>
+            <field name="email_to">${object.manager}</field>
+            <field name="model_id" ref="model_hr_expense_expense"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.employee_id.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+                <div style="
+                    font-family     : 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif;
+                    font-size       : 12px;
+                    color           : rgb(34, 34, 34);
+                    background-color: #FFF;
+                    ">
+
+                    <p>Hello,</p>
+                    <p>A new expense has been approved and is ready for export. </p>
+                    <br/>
+                    ${ctx.get('edi_web_url_view')}
+                    <p>You can view the expense using the following link: </p>
+                    <a style="
+                        display:block; width: 150px; height:20px;
+                        margin-left: 20px; color: #DDD;
+                        font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
+                        font-size: 13px; font-weight: bold; text-align: center;
+                        text-decoration: none !important; line-height: 1;
+                        padding: 5px 0px 0px 0px; background-color: #8E0000;
+                        border-radius: 5px 5px; background-repeat: repeat no-repeat;"
+
+                        href="${ctx.get('edi_web_url_view') or ''}">
+                        View Expense
+                    </a>
+                    <br/>
+                </div>
+            ]]></field>
+            <field name="body_text"><![CDATA[
+                Hello,
+                A new expense has been approved and is ready for export.
+                You can view the expense using the following link:
+                ${ctx.get('edi_web_url_view') or 'n/a'}
+            ]]></field>
         </record>
 
     </data>

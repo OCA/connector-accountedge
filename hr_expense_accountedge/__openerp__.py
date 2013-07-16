@@ -34,7 +34,7 @@
         'hr_expense_line_supplier_tax',
         'hr_expense_line_account',
         'hr_expense_line_number',
-        'account_tax_accountedge'
+        'account_account_halftax'
         ],
     "init_xml" : [],
     "update_xml" : [

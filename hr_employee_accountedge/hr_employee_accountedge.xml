@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                 <form string="Employee">
                     <notebook>
-                        <page string="Harmonisation avec MyOB">
+                        <page string="Harmonization with AccountEdge">
                             <field name="supplier_id_accountedge"/>
                         </page>
                     </notebook>
