@@ -1,6 +1,0 @@
-Card ID	Date	Vendor Invoice #	Account Number	Amount	Description                        	Tax Code	GST Amount	PST/QST Amount	Currency Code	Exchange Rate
-ID002	07/10/2013	6	1-2100	1500.00	Air Ticket	000	0.00	0.00	CAD	1.34
-
-ID001	07/10/2013	5	1-2100	875.00	Hotel Accommodation	000	0.00	0.00	CAD	1.34
-ID001	07/10/2013	5	1-2100	1600.00	Car Travel Expenses	000	0.00	0.00	CAD	1.34
-

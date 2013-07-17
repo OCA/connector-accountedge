@@ -98,6 +98,11 @@ class hr_expense_expense(osv.osv):
         res['amount_gst']           = res['amount_before_tax'] * res['amount_gst']
         res['amount_pst']           = res['amount_before_tax'] * res['amount_pst']
 
+        # Make sure the addition of the 3 values matches the original amount entered by the user
+        res['amount_gst']           = round(res['amount_gst'], 2)
+        res['amount_pst']           = round(res['amount_pst'], 2)
+        res['amount_before_tax']    = expense_line.total_amount - res['amount_gst'] - res['amount_pst']
+
         return res
 
 
@@ -120,14 +125,13 @@ class hr_expense_expense(osv.osv):
         if not len(ids):
             return False
 
-        # L'utilisateur doit avoir un recordID correspondant à
-        # son compte fournisseur dans AccountEdge pour pouvoir
-        # générer la note de frais
+        # The user's recordID must match with their supplier account in
+        # AccountEdge to be able to generate the expense report
         for id in ids:
             this    = self.browse(cr, uid, id)
             if not this.employee_id.supplier_id_accountedge:
-                raise osv.except_osv('ID du fournisseur dans AccountEdge manquant',
-                        'Veuillez ajouter ID de fournisseur AccountEdge pour dans la fiche cet employé au préalable.')
+                raise osv.except_osv('Supplier ID in AccountEdge missing',
+                        'Please add a supplier ID (card ID) for this employee before exporting.')
 
             self._create_csv_report(cr,uid,ids,{})
             self.write(cr,uid,ids,{'state': 'exported'})
@@ -167,11 +171,11 @@ class hr_expense_expense(osv.osv):
         return res
 
     _columns = {
-        'manager' : fields.function(
+        'manager_emails' : fields.function(
             _get_cur_account_manager,
-            string='Manager',
+            string='Manager Emails',
             type='char',
-            size=128,
+            size=255,
             readonly=True),
         'state' : fields.selection([
             ('draft', 'New'),

@@ -24,7 +24,7 @@ from osv import osv, fields
 class account_tax(osv.osv):
     _inherit = 'account.tax'
     _columns = {
-        'tax_code_accountedge': fields.char('Code de taxe dans AccountEdge', size=16, required=False),
+        'tax_code_accountedge': fields.char('Tax code in AccountEdge', size=16, required=False),
     }
 
 account_tax()
