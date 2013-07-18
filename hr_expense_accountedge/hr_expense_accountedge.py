@@ -46,7 +46,7 @@ class hr_expense_expense(osv.osv):
                 taxes = self._compute_taxes(cr,uid,l,context)
                 output  += u"%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%.2f\t%.2f\t%s\t%.2f\r\n" % (
                         this.employee_id.supplier_id_accountedge,
-                        datetime.strptime(l.date_value,"%Y-%m-%d").strftime("%m/%d/%Y"),
+                        datetime.strptime(l.date_value,"%Y-%m-%d").strftime("%d-%m-%Y"),
                         l.expense_id.id,
                         l.account_id.code,
                         taxes['amount_before_tax'],
@@ -154,6 +154,10 @@ class hr_expense_expense(osv.osv):
             grp_ids = self.pool.get('res.groups').search(cr, uid, [('name','=',u'Manager'),('category_id.name','=',u'Accounting & Finance')])
             usr_ids = self.pool.get('res.users').search(cr, uid, [('groups_id','=',grp_ids[0])])
             usrs    = self.pool.get('res.users').browse(cr, uid, usr_ids)
+
+            if not usrs:
+                raise osv.except_osv('Found no Accounting & Finance Manager in the company',
+                    'Please add one before approving the expense.')
 
             for user in usrs:
                 if user.user_email:

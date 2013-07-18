@@ -57,8 +57,8 @@
                         <button name="refuse" states="confirm,accepted" string="Refuse" type="workflow" icon="gtk-no" groups="base.group_hr_user" />
                         <button name="confirm" states="draft" string="Submit to Manager" type="workflow" icon="gtk-apply"/>
                         <button name="validate" states="confirm" string="Approve" type="workflow" icon="gtk-go-forward" groups="base.group_hr_user"/>
-                        <button name="action_exported" states="accepted" string="Export CSV" type="workflow" groups="account.group_account_manager"/>
-                        <button name="action_imported" states="exported" confirm="This action cannot be undone" string="Mark as imported" type="workflow" groups="account.group_account_manager"/>
+                        <button name="action_exported" states="accepted" string="Export CSV" type="workflow" groups="account.group_account_manager,account.group_account_invoice"/>
+                        <button name="action_imported" states="exported" confirm="This action cannot be undone" string="Mark as imported" type="workflow" groups="account.group_account_manager,account.group_account_invoice"/>
                     </group>
                 </group>
             </field>

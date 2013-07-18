@@ -81,7 +81,7 @@ def main():
 
 
         # Mark the expenses as imported
-        values = {'state': 'imported'}
+        values = {'state': 'exported'}
         result = sock.execute(dbname, uid, pwd, 'hr.expense.expense', 'write', expense_ids, values)
 
     final_csv.close()
