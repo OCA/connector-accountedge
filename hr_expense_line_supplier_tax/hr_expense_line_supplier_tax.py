@@ -96,5 +96,15 @@ class hr_expense_line(osv.osv):
 
 hr_expense_line()
 
+
+class hr_expense_expense(osv.osv):
+    _inherit = 'hr.expense.expense'
+
+    _columns = {
+        'line_ids': fields.one2many('hr.expense.line', 'expense_id', 'Expense Lines', readonly=True, states={'draft':[('readonly',False)],'accepted':[('readonly',False)]} ),
+    }
+
+hr_expense_expense()
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
 

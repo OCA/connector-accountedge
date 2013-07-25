@@ -30,6 +30,7 @@
         It also modifies the workflow of the expenses.
     """,
     "depends" : [
+        'l10n_ca',
         'hr_employee_accountedge',
         'hr_expense_line_supplier',
         'hr_expense_line_supplier_tax',

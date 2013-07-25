@@ -36,9 +36,7 @@ class hr_expense_expense(osv.osv):
             empl_id = self.pool.get('hr.employee').search(cr, uid, [('user_id','=', this.user_id.id)])
             empl    = self.pool.get('hr.employee').browse(cr, uid, empl_id)[0]
 
-            output  = this.employee_id.name
-            output += "\r\n"
-            output += "Card ID\tDate\tVendor Invoice #\tAccount Number\tAmount\tDescription\
+            output  = "Card ID\tDate\tVendor Invoice #\tAccount Number\tAmount\tDescription\
                         \tTax Code\tGST Amount\tPST/QST Amount\tCurrency Code\tExchange Rate\r\n"
 
 
@@ -109,7 +107,7 @@ class hr_expense_expense(osv.osv):
 
     def _add_attachment(self,cr,uid,ids,content,context={}):
 
-        file_name   = 'rapport_'+time.strftime('%Y%m%d_%H%M%S')
+        file_name   = 'rapport_' + time.strftime('%Y%m%d_%H%M%S') + '.tsv'
         attach_id   = self.pool.get('ir.attachment').create(cr, uid, {
             'name'          : file_name,
             'datas'         : base64.encodestring(content),
