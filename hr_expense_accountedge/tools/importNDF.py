@@ -21,28 +21,45 @@
 
 import xmlrpclib
 import base64
+import getpass
 from datetime import datetime
 
 def main():
-    username    = 'admin'
-    pwd         = 'admin'
+    username    = 'mbelbeche'
+    pwd         = ''
+    #dbname      = 'Test'
+    #server_url  = 'http://erp.savoirfairelinux.com:9999'
     dbname      = 'test_import_accountedge'
-    server_url  = 'http://localhost:8069'
+    server_url  = 'http://192.168.50.134:8069'
+    csv_path    = 'hr_expense_accountedge.tsv'
 
+    pwd = getpass.getpass(prompt="Entrez le mot de passe pour l'usager 'mbelbeche' : ")
+    
     # Get the uid
     sock_common = xmlrpclib.ServerProxy('%s/xmlrpc/common' % server_url)
     uid = sock_common.login(dbname, username, pwd)
 
-    # Replace localhost with the address of the server
+    if not uid:
+        print "Erreur de connexion. Veuillez verifier le mot de passe et le nom d'usager."
+        goodbye = raw_input("Tapez 'enter' pour quiter ...")
+        return 1
+
+    # Replace localhost with the address of the server 
     sock = xmlrpclib.ServerProxy('%s/xmlrpc/object' % server_url)
 
     # Search for exported expense notes
     args = [('state', '=', 'exported')]
     expense_ids = sock.execute(dbname, uid, pwd, 'hr.expense.expense', 'search', args)
 
-    # Outpout file for AccountEdge
-    final_csv = open('hr_expense_accountedge.csv', 'w')
+    print "Il y a %d notes de frais a importer" % len(expense_ids)
 
+    if not expense_ids:
+        goodbye = raw_input("Tapez 'enter' pour quiter ...")
+        return 1
+   
+    # Outpout file for AccountEdge
+    final_csv = open(csv_path, 'w')
+    
     num_expense = 0
 
     # For each exported expense note, search for he csv attachment
@@ -50,18 +67,19 @@ def main():
 
         args    = [('res_model','=','hr.expense.expense'),('res_id', '=', expense_id)]
         csv_ids = sock.execute(dbname, uid, pwd, 'ir.attachment', 'search', args)
-
+        
         fields  = ['name', 'datas']
         csv_obj = sock.execute(dbname, uid, pwd, 'ir.attachment', 'read', csv_ids, fields)
-
+        
         latest_csv = None
         latest_date = datetime(2000, 1, 1, 0, 0, 0)
 
         # Find the latest csv
         for csv in csv_obj:
-            format = 'rapport_%Y%m%d_%H%M%S'
-            date_created = datetime.strptime(csv["name"], format)
 
+            format = 'rapport_%Y%m%d_%H%M%S.tsv'
+            date_created = datetime.strptime(csv["name"], format)
+            
             if date_created > latest_date:
                 latest_date = date_created
                 latest_csv = csv
@@ -70,9 +88,10 @@ def main():
         if latest_csv:
             content     = base64.b64decode(csv['datas'])
             content     = content.split("\r\n")
-
+ 
+            
             for num_line in range(len(content)):
-                if (num_line == 1 and num_expense == 0) or num_line > 1:
+                if (num_line == 0 and num_expense == 0) or num_line > 0:
                     final_csv.write(content[num_line])
                     final_csv.write("\r\n")
 
@@ -85,6 +104,8 @@ def main():
         result = sock.execute(dbname, uid, pwd, 'hr.expense.expense', 'write', expense_ids, values)
 
     final_csv.close()
+
+    goodbye = raw_input("Tapez 'enter' pour quiter ...")
 
 if __name__ == "__main__":
     main()
