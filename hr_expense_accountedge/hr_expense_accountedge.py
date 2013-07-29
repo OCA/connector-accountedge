@@ -36,7 +36,9 @@ class hr_expense_expense(osv.osv):
             empl_id = self.pool.get('hr.employee').search(cr, uid, [('user_id','=', this.user_id.id)])
             empl    = self.pool.get('hr.employee').browse(cr, uid, empl_id)[0]
 
-            output  = "Card ID\tDate\tVendor Invoice #\tAccount Number\tAmount\tDescription\
+            output  = this.employee_id.name
+            output += "\r\n"
+            output += "Card ID\tDate\tVendor Invoice #\tAccount Number\tAmount\tDescription\
                         \tTax Code\tGST Amount\tPST/QST Amount\tCurrency Code\tExchange Rate\r\n"
 
 
@@ -44,7 +46,7 @@ class hr_expense_expense(osv.osv):
                 taxes = self._compute_taxes(cr,uid,l,context)
                 output  += u"%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%.2f\t%.2f\t%s\t%.2f\r\n" % (
                         this.employee_id.supplier_id_accountedge,
-                        datetime.strptime(l.date_value,"%Y-%m-%d").strftime("%d-%m-%Y"),
+                        datetime.strptime(l.date_value,"%Y-%m-%d").strftime("%m/%d/%Y"),
                         l.expense_id.id,
                         l.account_id.code,
                         taxes['amount_before_tax'],
@@ -96,18 +98,13 @@ class hr_expense_expense(osv.osv):
         res['amount_gst']           = res['amount_before_tax'] * res['amount_gst']
         res['amount_pst']           = res['amount_before_tax'] * res['amount_pst']
 
-        # Make sure the addition of the 3 values matches the original amount entered by the user
-        res['amount_gst']           = round(res['amount_gst'], 2)
-        res['amount_pst']           = round(res['amount_pst'], 2)
-        res['amount_before_tax']    = expense_line.total_amount - res['amount_gst'] - res['amount_pst']
-
         return res
 
 
 
     def _add_attachment(self,cr,uid,ids,content,context={}):
 
-        file_name   = 'rapport_' + time.strftime('%Y%m%d_%H%M%S') + '.tsv'
+        file_name   = 'rapport_'+time.strftime('%Y%m%d_%H%M%S')
         attach_id   = self.pool.get('ir.attachment').create(cr, uid, {
             'name'          : file_name,
             'datas'         : base64.encodestring(content),
@@ -123,13 +120,14 @@ class hr_expense_expense(osv.osv):
         if not len(ids):
             return False
 
-        # The user's recordID must match with their supplier account in
-        # AccountEdge to be able to generate the expense report
+        # L'utilisateur doit avoir un recordID correspondant à
+        # son compte fournisseur dans AccountEdge pour pouvoir
+        # générer la note de frais
         for id in ids:
             this    = self.browse(cr, uid, id)
             if not this.employee_id.supplier_id_accountedge:
-                raise osv.except_osv('Supplier ID in AccountEdge missing',
-                        'Please add a supplier ID (card ID) for this employee before exporting.')
+                raise osv.except_osv('ID du fournisseur dans AccountEdge manquant',
+                        'Veuillez ajouter ID de fournisseur AccountEdge pour dans la fiche cet employé au préalable.')
 
             self._create_csv_report(cr,uid,ids,{})
             self.write(cr,uid,ids,{'state': 'exported'})
@@ -153,10 +151,6 @@ class hr_expense_expense(osv.osv):
             usr_ids = self.pool.get('res.users').search(cr, uid, [('groups_id','=',grp_ids[0])])
             usrs    = self.pool.get('res.users').browse(cr, uid, usr_ids)
 
-            if not usrs:
-                raise osv.except_osv('Found no Accounting & Finance Manager in the company',
-                    'Please add one before approving the expense.')
-
             for user in usrs:
                 if user.user_email:
                     emails += user.user_email
@@ -173,11 +167,11 @@ class hr_expense_expense(osv.osv):
         return res
 
     _columns = {
-        'manager_emails' : fields.function(
+        'manager' : fields.function(
             _get_cur_account_manager,
-            string='Manager Emails',
+            string='Manager',
             type='char',
-            size=255,
+            size=128,
             readonly=True),
         'state' : fields.selection([
             ('draft', 'New'),

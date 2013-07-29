@@ -20,6 +20,7 @@
 ##############################################################################
 
 from osv import osv, fields
+import decimal_precision as dp
 
 class hr_expense_line(osv.osv):
     _inherit = 'hr.expense.line'
@@ -88,8 +89,29 @@ class hr_expense_line(osv.osv):
         return values
 
 
+    def _get_parent_state(self, cr, uid, ids, field_name, arg, context):
+        res  = {}
+        for id in ids:
+            expense_line = self.pool.get('hr.expense.line').browse(cr, uid, id)
+            res[id] = expense_line.expense_id.state
+        return res
+
     _columns = {
         'tax_id': fields.many2one('account.tax', 'Tax', domain= [('type_tax_use', '=', 'purchase')]),
+        'name': fields.char('Expense Note', size=128, required=True, readonly=True, states={'draft':[('readonly',False)]}),
+        'date_value': fields.date('Date', required=True, readonly=True, states={'draft':[('readonly',False)]}),
+        'unit_amount': fields.float('Unit Price', digits_compute=dp.get_precision('Account'), readonly=True, states={'draft':[('readonly',False)]}),
+        'unit_quantity': fields.float('Quantities', readonly=True, states={'draft':[('readonly',False)]}),
+        'product_id': fields.many2one('product.product', 'Product', domain=[('hr_expense_ok','=',True)], readonly=True, states={'draft':[('readonly',False)]}),
+        'uom_id': fields.many2one('product.uom', 'UoM', readonly=True, states={'draft':[('readonly',False)]}),
+        'ref': fields.char('Reference', size=32, readonly=True, states={'draft':[('readonly',False)]}),
+        'partner_id': fields.many2one('res.partner', 'Supplier', required=True, readonly=True, states={'draft':[('readonly',False)]}),
+        'state': fields.function(
+            _get_parent_state,
+            string='Expense State',
+            type='char',
+            size=128,
+            readonly=True),
     }
 
 

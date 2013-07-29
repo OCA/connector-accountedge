@@ -21,8 +21,10 @@
                 <field name="product_id" position="after">
                     <field name="partner_id" domain="[('supplier','=',True)]" select="2" on_change="onchange_partner_id(partner_id)"/>
                 </field>
+
                 <field name="uom_id" position="before">
                     <field name="tax_id" groups="account.group_account_invoice"/>
+                    <field name="state" invisible="1"/>
                 </field>
             </field>
         </record>
