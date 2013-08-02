@@ -25,15 +25,13 @@ import getpass
 from datetime import datetime
 
 def main():
-    username    = 'mbelbeche'
+    username    = 'myob_user'
     pwd         = ''
-    #dbname      = 'Test'
-    #server_url  = 'http://erp.savoirfairelinux.com:9999'
-    dbname      = 'test_import_accountedge'
-    server_url  = 'http://192.168.50.134:8069'
+    dbname      = ''
+    server_url  = 'http://localhost:8069'
     csv_path    = 'hr_expense_accountedge.tsv'
 
-    pwd = getpass.getpass(prompt="Entrez le mot de passe pour l'usager 'mbelbeche' : ")
+    pwd = getpass.getpass(prompt="Entrez le mot de passe pour l'usager %s: " % username)
     
     # Get the uid
     sock_common = xmlrpclib.ServerProxy('%s/xmlrpc/common' % server_url)
@@ -41,7 +39,7 @@ def main():
 
     if not uid:
         print "Erreur de connexion. Veuillez verifier le mot de passe et le nom d'usager."
-        goodbye = raw_input("Tapez 'enter' pour quiter ...")
+        goodbye = raw_input("Tapez 'enter' pour quitter ...")
         return 1
 
     # Replace localhost with the address of the server 
@@ -54,7 +52,7 @@ def main():
     print "Il y a %d notes de frais a importer" % len(expense_ids)
 
     if not expense_ids:
-        goodbye = raw_input("Tapez 'enter' pour quiter ...")
+        goodbye = raw_input("Tapez 'enter' pour quitter ...")
         return 1
    
     # Outpout file for AccountEdge
@@ -105,7 +103,7 @@ def main():
 
     final_csv.close()
 
-    goodbye = raw_input("Tapez 'enter' pour quiter ...")
+    goodbye = raw_input("Tapez 'enter' pour quitter ...")
 
 if __name__ == "__main__":
     main()
