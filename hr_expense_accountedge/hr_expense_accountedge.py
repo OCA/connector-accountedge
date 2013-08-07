@@ -104,7 +104,7 @@ class hr_expense_expense(osv.osv):
 
     def _add_attachment(self,cr,uid,ids,content,context={}):
 
-        file_name   = 'report_'+time.strftime('%Y%m%d_%H%M%S')
+        file_name   = 'report_'+time.strftime('%Y%m%d_%H%M%S')+'.tsv'
         attach_id   = self.pool.get('ir.attachment').create(cr, uid, {
             'name'          : file_name,
             'datas'         : base64.encodestring(content),
