@@ -25,21 +25,21 @@ import getpass
 from datetime import datetime
 
 def main():
-    username    = 'myob_user'
+    username    = 'openerp_user'
     pwd         = ''
     dbname      = ''
     server_url  = 'http://localhost:8069'
     csv_path    = 'hr_expense_accountedge.tsv'
 
-    pwd = getpass.getpass(prompt="Entrez le mot de passe pour l'usager %s: " % username)
+    pwd = getpass.getpass(prompt="Please enter the password of %s: " % username)
     
     # Get the uid
     sock_common = xmlrpclib.ServerProxy('%s/xmlrpc/common' % server_url)
     uid = sock_common.login(dbname, username, pwd)
 
     if not uid:
-        print "Erreur de connexion. Veuillez verifier le mot de passe et le nom d'usager."
-        goodbye = raw_input("Tapez 'enter' pour quitter ...")
+        print "Connection error. Please check the username, password and server url."
+        goodbye = raw_input("Type 'enter' to quit...")
         return 1
 
     # Replace localhost with the address of the server 
@@ -49,10 +49,10 @@ def main():
     args = [('state', '=', 'exported')]
     expense_ids = sock.execute(dbname, uid, pwd, 'hr.expense.expense', 'search', args)
 
-    print "Il y a %d notes de frais a importer" % len(expense_ids)
+    print "There are %d expense sheets to import" % len(expense_ids)
 
     if not expense_ids:
-        goodbye = raw_input("Tapez 'enter' pour quitter ...")
+        goodbye = raw_input("Type 'enter' to quit...")
         return 1
    
     # Outpout file for AccountEdge
@@ -75,7 +75,7 @@ def main():
         # Find the latest csv
         for csv in csv_obj:
 
-            format = 'rapport_%Y%m%d_%H%M%S.tsv'
+            format = 'report_%Y%m%d_%H%M%S'
             date_created = datetime.strptime(csv["name"], format)
             
             if date_created > latest_date:
@@ -103,11 +103,8 @@ def main():
 
     final_csv.close()
 
-    goodbye = raw_input("Tapez 'enter' pour quitter ...")
+    goodbye = raw_input("Type 'enter' to quit...")
 
 if __name__ == "__main__":
     main()
-
-
-
 
