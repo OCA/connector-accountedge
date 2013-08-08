@@ -46,7 +46,7 @@ class hr_expense_expense(osv.osv):
                 taxes = self._compute_taxes(cr,uid,l,context)
                 output  += u"%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%.2f\t%.2f\t%s\t%.2f\r\n" % (
                         this.employee_id.supplier_id_accountedge,
-                        datetime.strptime(l.date_value,"%Y-%m-%d").strftime("%m/%d/%Y"),
+                        datetime.strptime(l.date_value,"%Y-%m-%d").strftime("%d-%m-%Y"),
                         l.expense_id.id,
                         l.account_id.code,
                         taxes['amount_before_tax'],

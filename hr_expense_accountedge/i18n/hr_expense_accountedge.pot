@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenERP Server 6.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-19 19:38+0000\n"
-"PO-Revision-Date: 2013-07-19 19:38+0000\n"
+"POT-Creation-Date: 2013-08-08 20:04+0000\n"
+"PO-Revision-Date: 2013-08-08 20:04+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -66,8 +66,13 @@ msgid "\n"
 msgstr ""
 
 #. module: hr_expense_accountedge
-#: model:email.template,subject:hr_expense_accountedge.email_template_edi_expense_accepted
-msgid "New expense approved and ready for export"
+#: view:hr.expense.expense:0
+msgid "Mark as imported"
+msgstr ""
+
+#. module: hr_expense_accountedge
+#: field:hr.expense.expense,web_url_view:0
+msgid "Url of the expense view"
 msgstr ""
 
 #. module: hr_expense_accountedge
@@ -76,13 +81,13 @@ msgid "Approve"
 msgstr ""
 
 #. module: hr_expense_accountedge
-#: view:hr.expense.expense:0
-msgid "Mark as imported"
+#: model:ir.model,name:hr_expense_accountedge.model_hr_expense_line
+msgid "Expense Line"
 msgstr ""
 
 #. module: hr_expense_accountedge
-#: view:hr.expense.expense:0
-msgid "This action cannot be undone"
+#: model:email.template,subject:hr_expense_accountedge.email_template_edi_expense_accepted
+msgid "New expense approved and ready for export"
 msgstr ""
 
 #. module: hr_expense_accountedge
@@ -102,13 +107,13 @@ msgid "Email Templates"
 msgstr ""
 
 #. module: hr_expense_accountedge
-#: field:hr.expense.expense,web_url_view:0
-msgid "Url of the expense view"
+#: field:hr.expense.line,state:0
+msgid "Expense State"
 msgstr ""
 
 #. module: hr_expense_accountedge
-#: field:hr.expense.expense,manager_emails:0
-msgid "Manager Emails"
+#: field:hr.expense.expense,manager:0
+msgid "Manager"
 msgstr ""
 
 #. module: hr_expense_accountedge
@@ -159,6 +164,11 @@ msgstr ""
 #. module: hr_expense_accountedge
 #: model:ir.actions.server,name:hr_expense_accountedge.ir_actions_server_edi_expense_approved
 msgid "Auto-email expense approved"
+msgstr ""
+
+#. module: hr_expense_accountedge
+#: view:hr.expense.expense:0
+msgid "This action cannot be undone"
 msgstr ""
 
 #. module: hr_expense_accountedge
