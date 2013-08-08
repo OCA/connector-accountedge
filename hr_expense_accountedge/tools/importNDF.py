@@ -26,7 +26,6 @@ from datetime import datetime
 
 def main():
     username    = 'openerp_user'
-    pwd         = ''
     dbname      = ''
     server_url  = 'http://localhost:8069'
     csv_path    = 'hr_expense_accountedge.tsv'
