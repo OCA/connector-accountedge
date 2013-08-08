@@ -18,24 +18,6 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.·····
 #
 ##############################################################################
-{
-    "name" : "Line number on expense line",
-    "version" : "1.0",
-    "author" : "Savoir-faire Linux",
-    "website" : "http://www.savoirfairelinux.com",
-    "category" : "Human Resources",
-    "description": """
-        This module adds a 'line number' field on the expense line.
-        The field is called 'sequence'.
-    """,
-    "depends" : ['hr_expense'],
-    "init_xml" : [],
-    "update_xml" : [
-        'hr_expense_line_number.xml',
-    ],
-    "demo_xml" : [],
-    "installable" : True,
-    "certificate" : ''
-}
+import hr_expense_line_sequence
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
 

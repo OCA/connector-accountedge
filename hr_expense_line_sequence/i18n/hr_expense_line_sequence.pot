@@ -1,6 +1,6 @@
 # Translation of OpenERP Server.
 # This file contains the translation of the following modules:
-#	* hr_expense_line_number
+#	* hr_expense_line_sequence
 #
 msgid ""
 msgstr ""
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
 
-#. module: hr_expense_line_number
-#: model:ir.model,name:hr_expense_line_number.model_hr_expense_line
+#. module: hr_expense_line_sequence
+#: model:ir.model,name:hr_expense_line_sequence.model_hr_expense_line
 msgid "Expense Line"
 msgstr ""
 
