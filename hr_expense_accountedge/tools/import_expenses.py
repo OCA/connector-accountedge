@@ -59,7 +59,7 @@ def main():
     
     num_expense = 0
 
-    # For each exported expense note, search for he csv attachment
+    # For each exported expense note, search for the tsv attachment
     for expense_id in expense_ids:
 
         args    = [('res_model','=','hr.expense.expense'),('res_id', '=', expense_id)]
@@ -88,7 +88,7 @@ def main():
  
             
             for num_line in range(len(content)):
-                if (num_line == 0 and num_expense == 0) or num_line > 0:
+                if (num_line == 1 and num_expense == 0) or num_line > 1:
                     final_csv.write(content[num_line])
                     final_csv.write("\r\n")
 
