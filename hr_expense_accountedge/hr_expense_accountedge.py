@@ -120,14 +120,13 @@ class hr_expense_expense(osv.osv):
         if not len(ids):
             return False
 
-        # L'utilisateur doit avoir un recordID correspondant à
-        # son compte fournisseur dans AccountEdge pour pouvoir
-        # générer la note de frais
+        # Employee must have a recordID matching his supplier account
+        # in Accountedge to generate an expense sheet
         for id in ids:
             this    = self.browse(cr, uid, id)
             if not this.employee_id.supplier_id_accountedge:
-                raise osv.except_osv('ID du fournisseur dans AccountEdge manquant',
-                        'Veuillez ajouter ID de fournisseur AccountEdge pour dans la fiche cet employé au préalable.')
+                raise osv.except_osv('Accountedge Supplier ID missing',
+                        'Please add the Accountedge supplier ID on the employee before exporting the sheet.')
 
             self._create_csv_report(cr,uid,ids,{})
             self.write(cr,uid,ids,{'state': 'exported'})
@@ -167,12 +166,7 @@ class hr_expense_expense(osv.osv):
         return res
 
     _columns = {
-        'manager' : fields.function(
-            _get_cur_account_manager,
-            string='Manager',
-            type='char',
-            size=128,
-            readonly=True),
+        'manager' : fields.function(_get_cur_account_manager,string='Manager',type='char',size=128,readonly=True),
         'state' : fields.selection([
             ('draft', 'New'),
             ('confirm', 'Waiting Approval'),
@@ -192,5 +186,20 @@ class hr_expense_expense(osv.osv):
 
 hr_expense_expense()
 
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+class hr_expense_line(osv.osv):
+    _inherit = 'hr.expense.line'
 
+    def _get_parent_state(self, cr, uid, ids, field_name, arg, context):
+        res  = {}
+        for id in ids:
+            expense_line = self.pool.get('hr.expense.line').browse(cr, uid, id)
+            res[id] = expense_line.expense_id.state
+        return res
+
+    _columns = {
+        'state': fields.function(_get_parent_state,string='Expense State',type='char',size=128,readonly=True),
+    }
+
+hr_expense_line()
+
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -34,18 +34,17 @@ class hr_expense_line(osv.osv):
         purch_tax   = product.product_tmpl_id.supplier_taxes_id
 
         if purch_tax:
-            # Si le produit a une taxe à l'achat, elle devient la taxe par défaut
+            # Use the default purchase tax set on the product
             defaut_tax = purch_tax[0]
 
-            # Voir la fiche du fournisseur
+            # Get the fiscal position of the supplier
             supplier= self.pool.get('res.partner').browse(cr, uid, partner_id)
             acc_pos = supplier.property_account_position
 
-            # Si la position fiscale a une table de mapping source/destination ...
+            # Apply the fiscal position mapping rules
             if acc_pos.tax_ids:
                 for tax in acc_pos.tax_ids:
                     if tax.tax_src_id == defaut_tax:
-                        # ... remplacer la taxe par défaut par son équivalent
                         defaut_tax = tax.tax_dest_id
                         break
             return defaut_tax.id
@@ -88,45 +87,11 @@ class hr_expense_line(osv.osv):
             })
         return values
 
-
-    def _get_parent_state(self, cr, uid, ids, field_name, arg, context):
-        res  = {}
-        for id in ids:
-            expense_line = self.pool.get('hr.expense.line').browse(cr, uid, id)
-            res[id] = expense_line.expense_id.state
-        return res
-
     _columns = {
-        'tax_id': fields.many2one('account.tax', 'Tax', domain= [('type_tax_use', '=', 'purchase')]),
-        'name': fields.char('Expense Note', size=128, required=True, readonly=True, states={'draft':[('readonly',False)]}),
-        'date_value': fields.date('Date', required=True, readonly=True, states={'draft':[('readonly',False)]}),
-        'unit_amount': fields.float('Unit Price', digits_compute=dp.get_precision('Account'), readonly=True, states={'draft':[('readonly',False)]}),
-        'unit_quantity': fields.float('Quantities', readonly=True, states={'draft':[('readonly',False)]}),
-        'product_id': fields.many2one('product.product', 'Product', domain=[('hr_expense_ok','=',True)], readonly=True, states={'draft':[('readonly',False)]}),
-        'uom_id': fields.many2one('product.uom', 'UoM', readonly=True, states={'draft':[('readonly',False)]}),
-        'ref': fields.char('Reference', size=32, readonly=True, states={'draft':[('readonly',False)]}),
-        'partner_id': fields.many2one('res.partner', 'Supplier', required=True, readonly=True, states={'draft':[('readonly',False)]}),
-        'state': fields.function(
-            _get_parent_state,
-            string='Expense State',
-            type='char',
-            size=128,
-            readonly=True),
+        'tax_id': fields.many2one('account.tax', 'Tax', domain=[('type_tax_use', '=', 'purchase')]),
+        'partner_id': fields.many2one('res.partner', 'Supplier', required=True),
     }
-
-
 
 hr_expense_line()
 
-
-class hr_expense_expense(osv.osv):
-    _inherit = 'hr.expense.expense'
-
-    _columns = {
-        'line_ids': fields.one2many('hr.expense.line', 'expense_id', 'Expense Lines', readonly=True, states={'draft':[('readonly',False)],'accepted':[('readonly',False)]} ),
-    }
-
-hr_expense_expense()
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
-

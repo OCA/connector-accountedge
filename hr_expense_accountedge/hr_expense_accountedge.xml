@@ -36,13 +36,11 @@
         </record>
         <menuitem id="menu_email_templates_expenses" parent="hr.menu_hr_configuration" action="action_email_templates_expenses" sequence="30"/>
 
-    </data>
-
-    <data noupdate="1">
         <!--
-             Expenses
+             Expenses and Expense Lines
         -->
-        <record id="view_expenses_form" model="ir.ui.view">
+
+        <record id="view_expenses_form_line" model="ir.ui.view">
             <field name="name">hr.expense.form</field>
             <field name="type">form</field>
             <field name="model">hr.expense.expense</field>
@@ -51,6 +49,15 @@
                 <field name="state"  position="replace">
                      <field name="state" widget="statusbar" statusbar_visible="draft,confirm,accepted,exported,imported" statusbar_colors='{"confirm":"blue","cancelled":"red"}'/>
                 </field>
+
+                <field name="product_id" position="before">
+                    <field name="state" invisible="1"/>
+                </field>
+
+                <field name="line_ids" position="attributes">
+                    <attribute name="attrs">{'readonly':[('state','in',['confirm','cancelled','exported','imported'])]}</attribute>
+                </field>
+
                 <group col="6" colspan="2" position="replace">
                     <group col="6" colspan="2">
                         <button name="draft" states="confirm,cancelled,exported" string="Set to Draft" type="workflow" icon="gtk-convert" groups="base.group_hr_user"/>
@@ -61,9 +68,77 @@
                         <button name="action_imported" states="exported" confirm="This action cannot be undone" string="Mark as imported" type="workflow" groups="account.group_account_manager,account.group_account_invoice"/>
                     </group>
                 </group>
+
+                <field name="product_id" position="attributes">
+                    <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
+                </field>
+
+                <field name="name" position="attributes">
+                    <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
+                </field>
+
+                <field name="unit_amount" position="attributes">
+                    <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
+                </field>
+
+                <field name="unit_quantity" position="attributes">
+                    <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
+                </field>
+
+                <field name="uom_id" position="attributes">
+                    <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
+                </field>
+
+                <field name="date_value" position="attributes">
+                    <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
+                </field>
+
+                <field name="ref" position="attributes">
+                    <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
+                </field>
+
+                <field name="analytic_account" position="attributes">
+                    <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
+                </field>
+
             </field>
         </record>
 
+        <record id="view_expenses_form_partner" model="ir.ui.view">
+            <field name="name">hr.expense.form</field>
+            <field name="type">form</field>
+            <field name="model">hr.expense.expense</field>
+            <field name="inherit_id" ref="hr_expense_line_supplier_tax.view_expenses_form"/>
+            <field name="arch" type="xml">
+                <field name="partner_id" position="attributes">
+                    <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
+                </field>
+
+                <field name="tax_id" position="attributes">
+                    <attribute name="groups">account.group_account_invoice</attribute>
+                    <attribute name="attrs">{'readonly':[('state','in',['confirm','cancelled','exported','imported'])]}</attribute>
+                </field>
+
+            </field>
+        </record>
+
+        <record id="view_expenses_form_account" model="ir.ui.view">
+            <field name="name">hr.expense.form</field>
+            <field name="type">form</field>
+            <field name="model">hr.expense.expense</field>
+            <field name="inherit_id" ref="hr_expense_line_account.view_expenses_form"/>
+            <field name="arch" type="xml">
+                <field name="account_id" position="attributes">
+                    <attribute name="groups">account.group_account_invoice</attribute>
+                    <attribute name="attrs">{'readonly':[('state','in',['confirm','cancelled','exported','imported'])]}</attribute>
+                </field>
+
+            </field>
+        </record>
+
+    </data>
+
+    <data noupdate="1">
         <!--
              Workflow definition
         -->
@@ -115,7 +190,7 @@
 
 
         <!--
-             Email template for expensed that are waiting for approval
+             Email template for expenses that are waiting for approval
         -->
         <record id="email_template_edi_expense_waiting_approval" model="email.template">
             <field name="name">Automated Invoice Notification Mail</field>

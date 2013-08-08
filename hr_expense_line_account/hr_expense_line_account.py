@@ -38,7 +38,7 @@ class hr_expense_line(osv.osv):
 
         # If the field is empty
         if not exp_acc:
-            # Fidn the product's 'Parent category'
+            # Find the product's 'Parent category'
             parent_category = product.product_tmpl_id.categ_id
             # Try to find the expense account of the parent category
             exp_acc = parent_category.property_account_expense_categ
@@ -68,6 +68,5 @@ class hr_expense_line(osv.osv):
                 'account_id' : account_id
             })
         return values
-
 
 hr_expense_line()
