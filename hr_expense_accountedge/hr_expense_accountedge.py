@@ -39,7 +39,8 @@ class hr_expense_expense(osv.osv):
             output  = this.employee_id.name
             output += "\r\n"
             output += "Card ID\tDate\tVendor Invoice #\tAccount Number\tAmount\tDescription\
-                        \tTax Code\tGST Amount\tPST/QST Amount\tCurrency Code\tExchange Rate\r\n"
+                        \tTax Code\tCurrency Code\tExchange Rate\r\n"
+#                        \tTax Code\tGST Amount\tPST/QST Amount\tCurrency Code\tExchange Rate\r\n"
 
 
             for l in this.line_ids:
@@ -52,8 +53,8 @@ class hr_expense_expense(osv.osv):
                         taxes['amount_before_tax'],
                         l.name,
                         (l.tax_id.tax_code_accountedge or '000'),
-                        taxes['amount_gst'],
-                        taxes['amount_pst'],
+#                        taxes['amount_gst'],
+#                        taxes['amount_pst'],
                         (l.expense_id.currency_id.name or 'CAD'),
                         (float(l.expense_id.currency_id.rate) or '1.0'))
 
@@ -85,8 +86,7 @@ class hr_expense_expense(osv.osv):
 
         if tax.child_ids :
             for child_tax in tax.child_ids: # TODO: the detection of the two taxes should be more reliable
-                if  'TPS' in child_tax.name or \
-                    'GST' in child_tax.name:
+                if 'TPS' in child_tax.name or 'GST' in child_tax.name:
                     res['amount_gst'] = float(child_tax.amount) * tax_factor
                 else:
                     res['amount_pst'] = float(child_tax.amount) * tax_factor
