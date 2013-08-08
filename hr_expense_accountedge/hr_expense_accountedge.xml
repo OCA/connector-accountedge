@@ -73,10 +73,6 @@
                     <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
                 </field>
 
-                <field name="name" position="attributes">
-                    <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
-                </field>
-
                 <field name="unit_amount" position="attributes">
                     <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
                 </field>
@@ -93,13 +89,17 @@
                     <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
                 </field>
 
-                <field name="ref" position="attributes">
-                    <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
-                </field>
-
                 <field name="analytic_account" position="attributes">
                     <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
                 </field>
+
+                <xpath expr="//page/field/form/group/field[@name='ref']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
+                </xpath>
+
+                <xpath expr="//page/field/form/group/field[@name='name']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
+                </xpath>
 
             </field>
         </record>
