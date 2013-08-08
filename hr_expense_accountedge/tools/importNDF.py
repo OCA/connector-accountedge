@@ -75,7 +75,7 @@ def main():
         # Find the latest csv
         for csv in csv_obj:
 
-            format = 'report_%Y%m%d_%H%M%S.tsv'
+            format = 'export_%Y%m%d_%H%M%S.tsv'
             date_created = datetime.strptime(csv["name"], format)
             
             if date_created > latest_date:
