@@ -38,14 +38,16 @@ class hr_expense_expense(osv.osv):
 
             output  = this.employee_id.name
             output += "\r\n"
-            output += "Card ID\tDate\tVendor Invoice #\tAccount Number\tAmount\tDescription\
+            output += "Employee\tCard ID\tDate\tVendor Invoice #\tAccount Number\tAmount\tDescription\
                         \tTax Code\tCurrency Code\tExchange Rate\r\n"
 #                        \tTax Code\tGST Amount\tPST/QST Amount\tCurrency Code\tExchange Rate\r\n"
 
 
             for l in this.line_ids:
                 taxes = self._compute_taxes(cr,uid,l,context)
-                output  += u"%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%.2f\t%.2f\t%s\t%.2f\r\n" % (
+                #output  += u"%s\t%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%.2f\t%.2f\t%s\t%.2f\r\n" % (
+                output  += u"%s\t%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%s\t%.2f\r\n" % (
+                        this.employee_id.name,
                         this.employee_id.supplier_id_accountedge,
                         datetime.strptime(l.date_value,"%Y-%m-%d").strftime("%d-%m-%Y"),
                         l.expense_id.id,
