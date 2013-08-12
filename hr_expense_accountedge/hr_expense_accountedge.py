@@ -40,7 +40,9 @@ class hr_expense_expense(osv.osv):
             output += "\r\n"
             output += "Employee\tCard ID\tDate\tVendor Invoice #\tAccount Number\tAmount\tDescription\
                         \tTax Code\tCurrency Code\tExchange Rate\r\n"
-#                        \tTax Code\tGST Amount\tPST/QST Amount\tCurrency Code\tExchange Rate\r\n"
+            # Comment the previous line and uncomment the next one 
+            # if you want to import taxes with their amount, instead of their code
+            # \tTax Code\tGST Amount\tPST/QST Amount\tCurrency Code\tExchange Rate\r\n"
 
 
             for l in this.line_ids:
@@ -55,8 +57,10 @@ class hr_expense_expense(osv.osv):
                         taxes['amount_before_tax'],
                         l.name,
                         (l.tax_id.tax_code_accountedge or '000'),
-#                        taxes['amount_gst'],
-#                        taxes['amount_pst'],
+                        # Comment the previous line and uncomment the next two ones 
+                        # if you want to import taxes with their amount, instead of their code
+                        # taxes['amount_gst'],
+                        # taxes['amount_pst'],
                         (l.expense_id.currency_id.name or 'CAD'),
                         (float(l.expense_id.currency_id.rate) or '1.0'))
 
