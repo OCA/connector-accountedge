@@ -31,6 +31,8 @@ class hr_expense_line(osv.osv):
         '''
             Get the automatic value of the account_id field.
         '''
+        if not product_id:
+            return None
         # Retrieve the product
         product = self.pool.get('product.product').browse(cr, uid, product_id)
         # Product -> Accounting -> Expense account
@@ -59,14 +61,10 @@ class hr_expense_line(osv.osv):
 
 
     def onchange_product_id(self, cr, uid, ids, product_id, uom_id, employee_id, context=None):
-        if product_id:
-            values      = super(hr_expense_line, self).onchange_product_id(cr, uid, ids, product_id, uom_id, employee_id, context=context)
+        res = super(hr_expense_line, self).onchange_product_id(cr, uid, ids, product_id, uom_id, employee_id, context=context)
         for id in ids:
-            this        = self.browse(cr, uid, id)
-            account_id  = self.get_account_id(cr, uid, product_id, context)
-            values['value'].update({
-                'account_id' : account_id
-            })
-        return values
+            account_id = self.get_account_id(cr, uid, product_id, context)
+            res['value']['account_id'] = account_id
+        return res
 
 hr_expense_line()
