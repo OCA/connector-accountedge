@@ -194,12 +194,12 @@
         -->
         <record id="email_template_edi_expense_waiting_approval" model="email.template">
             <field name="name">Automated Invoice Notification Mail</field>
-            <field name="email_from">${object.company_id.email or 'noreply@localhost'}</field>
+            <field name="email_from">${object.employee_id.user_id.user_email or 'noreply@localhost'}</field>
             <field name="subject">New expense waiting for approval</field>
-            <field name="email_to">${object.employee_id.parent_id.work_email or 'naysan.saran@gmail.com'}</field>
+            <field name="email_to">${object.employee_id.parent_id.user_id.user_email}</field>
             <field name="model_id" ref="model_hr_expense_expense"/>
             <field name="auto_delete" eval="True"/>
-            <field name="lang">${object.employee_id.partner_id.lang}</field>
+            <field name="lang">${object.employee_id.user_id.context_lang}</field>
             <field name="body_html"><![CDATA[
                 <div style="
                     font-family     : 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif;
@@ -240,12 +240,12 @@
         -->
         <record id="email_template_edi_expense_accepted" model="email.template">
             <field name="name">Automated Invoice Notification Mail</field>
-            <field name="email_from">${object.company_id.email or 'noreply@localhost'}</field>
+            <field name="email_from">${object.employee_id.user_id.user_email or 'noreply@localhost'}</field>
             <field name="subject">New expense approved and ready for export</field>
-            <field name="email_to">${object.manager_emails}</field>
+            <field name="email_to">payable@localhost</field>
             <field name="model_id" ref="model_hr_expense_expense"/>
             <field name="auto_delete" eval="True"/>
-            <field name="lang">${object.employee_id.partner_id.lang}</field>
+            <field name="lang">${object.employee_id.user_id.context_lang}</field>
             <field name="body_html"><![CDATA[
                 <div style="
                     font-family     : 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif;
