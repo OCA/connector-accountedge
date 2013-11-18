@@ -47,11 +47,11 @@ class hr_expense_expense(osv.osv):
 
             for l in this.line_ids:
                 taxes = self._compute_taxes(cr,uid,l,context)
-                #output  += u"%s\t%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%.2f\t%.2f\t%s\t%.2f\r\n" % (
+                # output  += u"%s\t%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%.2f\t%.2f\t%s\t%.2f\r\n" % (
                 output  += u"%s\t%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%s\t%.2f\r\n" % (
                         this.employee_id.name,
                         this.employee_id.supplier_id_accountedge,
-                        datetime.strptime(l.date_value,"%Y-%m-%d").strftime("%d-%m-%Y"),
+                        datetime.today().strftime("%d-%m-%Y"),
                         l.expense_id.id,
                         l.account_id.code,
                         taxes['amount_before_tax'],
