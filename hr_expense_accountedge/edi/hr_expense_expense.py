@@ -22,28 +22,22 @@
 from osv import fields, osv, orm
 from edi import EDIMixin
 
+
 class hr_expense_expense(osv.osv, EDIMixin):
     _inherit = 'hr.expense.expense'
 
     def _edi_get_web_url_view(self, cr, uid, ids, field_name, arg, context):
-        res  = {}
-
+        res = {}
         for id in ids:
             web_root_url = self.pool.get('ir.config_parameter').get_param(cr, uid, 'web.base.url')
             res[id] = "%s/web/webclient/home#id=%s&view_type=page&model=hr.expense.expense" % (web_root_url, id)
-
         return res
 
     _columns = {
-        'web_url_view' : fields.function(
-            _edi_get_web_url_view,
-            string='Url of the expense view',
-            type='char',
-            size=255,
-            readonly=True),
+        'web_url_view': fields.function(_edi_get_web_url_view,
+                                        string='Url of the expense view',
+                                        type='char',
+                                        size=255,
+                                        readonly=True),
     }
-
-
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
-

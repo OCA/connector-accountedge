@@ -19,17 +19,17 @@
 #
 ##############################################################################
 {
-    "name" : "Harmonization of expenses with AccountEdge",
-    "version" : "1.0",
-    "author" : "Savoir-faire Linux",
-    "website" : "http://www.savoirfairelinux.com",
-    "category" : "Human Resources",
+    "name": "Harmonization of expenses with AccountEdge",
+    "version": "1.0",
+    "author": "Savoir-faire Linux",
+    "website": "http://www.savoirfairelinux.com",
+    "category": "Human Resources",
     "description": """
         This module generates the csv reports for the exportation
         of expenses in AccountEdge.
         It also modifies the workflow of the expenses.
     """,
-    "depends" : [
+    "depends": [
         'l10n_ca',
         'hr_employee_accountedge',
         'hr_expense_line_supplier',
@@ -39,14 +39,13 @@
         'account_account_halftax',
         'account_tax_accountedge'
         ],
-    "init_xml" : [],
-    "update_xml" : [
+    "init_xml": [],
+    "update_xml": [
         'hr_expense_accountedge.xml',
         'security/ir_rule.xml',
     ],
-    "demo_xml" : [],
-    "installable" : True,
-    "certificate" : ''
+    "demo_xml": [],
+    "installable": True,
+    "certificate": ''
 }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
-
