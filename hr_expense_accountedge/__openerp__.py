@@ -33,7 +33,6 @@
     "depends": [
         'l10n_ca',
         'hr_employee_accountedge',
-        'hr_expense_line_supplier',
         'hr_expense_line_supplier_tax',
         'hr_expense_line_account',
         'hr_expense_line_sequence',
