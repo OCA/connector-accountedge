@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 ##############################################################################
-#····
+#
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2010 Savoir-faire Linux (<http://www.savoirfairelinux.com>).
 #
@@ -19,13 +19,11 @@
 #
 ##############################################################################
 
-from osv import osv, fields
+from osv import orm, fields
 
-class account_tax(osv.osv):
+
+class account_tax(orm.Model):
     _inherit = 'account.tax'
     _columns = {
         'tax_code_accountedge': fields.char('Tax code in AccountEdge', size=16, required=False),
     }
-
-account_tax()
-

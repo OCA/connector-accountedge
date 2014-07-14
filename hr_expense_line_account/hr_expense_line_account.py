@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 ##############################################################################
-#····
+#
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2010 Savoir-faire Linux (<http://www.savoirfairelinux.com>).
 #
@@ -19,22 +19,21 @@
 #
 ##############################################################################
 
-from osv import osv, fields
+from osv import orm, fields
 
-class hr_expense_line(osv.osv):
+
+class hr_expense_line(orm.Model):
     _inherit = 'hr.expense.line'
     _columns = {
         'account_id': fields.many2one('account.account', 'Financial Account'),
     }
 
     def get_account_id(self, cr, uid, product_id, context=None):
-        '''
-            Get the automatic value of the account_id field.
-        '''
+        """Get the automatic value of the account_id field."""
         if not product_id:
             return None
         # Retrieve the product
-        product = self.pool.get('product.product').browse(cr, uid, product_id)
+        product = self.pool.get('product.product').browse(cr, uid, product_id, context=context)
         # Product -> Accounting -> Expense account
         exp_acc = product.product_tmpl_id.property_account_expense
 
@@ -50,21 +49,18 @@ class hr_expense_line(osv.osv):
 
         return None
 
-
     def create(self, cr, user, vals, context=None):
-        '''
-            Overwrite the create() function to automatically set the default account id
-            since regular employees cannot access this field.
-        '''
+        """Overwrite the create() function to automatically set the default account id
+        since regular employees cannot access this field.
+        """
         vals['account_id'] = self.get_account_id(cr, user, vals['product_id'], context)
-        return super(hr_expense_line,self).create(cr, user, vals, context)
-
+        return super(hr_expense_line, self).create(cr, user, vals, context)
 
     def onchange_product_id(self, cr, uid, ids, product_id, uom_id, employee_id, context=None):
-        res = super(hr_expense_line, self).onchange_product_id(cr, uid, ids, product_id, uom_id, employee_id, context=context)
+        res = super(hr_expense_line, self).onchange_product_id(
+            cr, uid, ids, product_id, uom_id, employee_id, context=context
+        )
         for id in ids:
             account_id = self.get_account_id(cr, uid, product_id, context)
             res['value']['account_id'] = account_id
         return res
-
-hr_expense_line()

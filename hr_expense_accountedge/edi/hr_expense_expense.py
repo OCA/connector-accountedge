@@ -19,11 +19,11 @@
 #
 ##############################################################################
 
-from osv import fields, osv, orm
+from openerp.osv import fields, orm
 from edi import EDIMixin
 
 
-class hr_expense_expense(osv.osv, EDIMixin):
+class hr_expense_expense(orm.Model, EDIMixin):
     _inherit = 'hr.expense.expense'
 
     def _edi_get_web_url_view(self, cr, uid, ids, field_name, arg, context):
@@ -40,4 +40,3 @@ class hr_expense_expense(osv.osv, EDIMixin):
                                         size=255,
                                         readonly=True),
     }
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

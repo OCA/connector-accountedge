@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 ##############################################################################
-#····
+#
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2010 Savoir-faire Linux (<http://www.savoirfairelinux.com>).
 #
@@ -22,11 +22,11 @@
 import time
 import base64
 
-from osv import osv, fields
+from osv import orm, fields
 from datetime import datetime
 
 
-class hr_expense_expense(osv.osv):
+class hr_expense_expense(orm.Model):
     _inherit = 'hr.expense.expense'
 
     def _create_csv_report(self, cr, uid, ids, context={}):
@@ -122,8 +122,10 @@ class hr_expense_expense(osv.osv):
         for id in ids:
             this = self.browse(cr, uid, id)
             if not this.employee_id.supplier_id_accountedge:
-                raise osv.except_osv('Accountedge Supplier ID missing',
-                                     'Please add the Accountedge supplier ID on the employee before exporting the sheet.')
+                raise orm.except_orm(
+                    'Accountedge Supplier ID missing',
+                    'Please add the Accountedge supplier ID on the employee before exporting the sheet.'
+                )
             self._create_csv_report(cr, uid, ids, {})
             self.write(cr, uid, ids, {'state': 'exported'})
         return True
@@ -139,7 +141,12 @@ class hr_expense_expense(osv.osv):
         res = {}
         for id in ids:
             emails = ''
-            grp_ids = self.pool.get('res.groups').search(cr, uid, [('name', '=', u'Manager'), ('category_id.name', '=', u'Accounting & Finance')])
+            grp_ids = self.pool.get('res.groups').search(
+                cr, uid, [
+                    ('name', '=', u'Manager'),
+                    ('category_id.name', '=', u'Accounting & Finance')
+                ]
+            )
             usr_ids = self.pool.get('res.users').search(cr, uid, [('groups_id', '=', grp_ids[0])])
             usrs = self.pool.get('res.users').browse(cr, uid, usr_ids)
 
@@ -166,18 +173,18 @@ class hr_expense_expense(osv.osv):
             ('exported', 'Exported'),
             ('imported', 'Imported'),
             ('cancelled', 'Refused'), ],
-            'State', readonly=True, help='When the expense request is created the state is \'Draft\'.\
-                    \n It is confirmed by the user and request is sent to admin, the state is \'Waiting Confirmation\'.\
-                    \nIf the admin accepts it, the state is \'Accepted\'.\
-                    \nIf the admin refuses it, the state is \'Refused\'.\
-                    \n If a csv file has been generated for the expense request, the state is  \'Exported\'.\
-                    \n If the expense request has been imported in AccountEdge, the state is \'Imported\'.'
+            'State', readonly=True,
+            help="When the expense request is created the state is 'Draft'.\n"
+            "It is confirmed by the user and request is sent to admin, the state is 'Waiting Confirmation'.\n"
+            "If the admin accepts it, the state is 'Accepted'.\n"
+            "If the admin refuses it, the state is 'Refused'.\n"
+            "If a csv file has been generated for the expense request, the state is 'Exported'.\n"
+            "If the expense request has been imported in AccountEdge, the state is 'Imported'."
         ),
     }
-hr_expense_expense()
 
 
-class hr_expense_line(osv.osv):
+class hr_expense_line(orm.Model):
     _inherit = 'hr.expense.line'
 
     def _get_parent_state(self, cr, uid, ids, field_name, arg, context):
@@ -190,6 +197,3 @@ class hr_expense_line(osv.osv):
     _columns = {
         'state': fields.function(_get_parent_state, string='Expense State', type='char', size=128, readonly=True),
     }
-hr_expense_line()
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
