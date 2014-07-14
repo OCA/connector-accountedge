@@ -36,7 +36,7 @@ def main():
     sock_common = xmlrpclib.ServerProxy('%s/xmlrpc/common' % server_url)
     uid = sock_common.login(dbname, username, pwd)
     if not uid:
-        print "Connection error. Please check the username, password and server url."
+        print("Connection error. Please check the username, password and server url.")
         raw_input("Type 'enter' to quit...")
         return 1
     # Replace localhost with the address of the server
@@ -44,7 +44,7 @@ def main():
     # Search for exported expense notes
     args = [('state', '=', 'exported')]
     expense_ids = sock.execute(dbname, uid, pwd, 'hr.expense.expense', 'search', args)
-    print "There are %d expense sheets to import" % len(expense_ids)
+    print("There are %d expense sheets to import" % len(expense_ids))
     if not expense_ids:
         raw_input("Type 'enter' to quit...")
         return 1

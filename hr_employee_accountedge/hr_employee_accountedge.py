@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 ##############################################################################
-#····
+#
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2010 Savoir-faire Linux (<http://www.savoirfairelinux.com>).
 #
@@ -19,15 +19,11 @@
 #
 ##############################################################################
 
-from osv import fields, osv
+from osv import fields, orm
 
-class hr_employee(osv.osv):
+
+class hr_employee(orm.Model):
     _inherit = 'hr.employee'
     _columns = {
         'supplier_id_accountedge': fields.char('Supplier ID in AccountEdge', size=16),
     }
-
-hr_employee()
-
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

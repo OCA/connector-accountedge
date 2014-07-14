@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 ##############################################################################
-#····
+#
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2010 Savoir-faire Linux (<http://www.savoirfairelinux.com>).
 #
@@ -18,23 +18,20 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.·····
 #
 ##############################################################################
+
 {
-    "name" : "Supplier id on expense line",
-    "version" : "1.0",
-    "author" : "Savoir-faire Linux",
-    "website" : "http://www.savoirfairelinux.com",
-    "category" : "Human Resources",
+    "name": "Supplier id on expense line",
+    "version": "1.0",
+    "author": "Savoir-faire Linux",
+    "website": "http://www.savoirfairelinux.com",
+    "category": "Human Resources",
     "description": """
         This module adds the 'supplier_id_accountedge' field to the
         hr.employee model.
     """,
-    "depends" : ['hr_expense'],
-    "init_xml" : [],
-    "update_xml" : [
+    "depends": ['hr_expense'],
+    "data": [
         'hr_employee_accountedge.xml',
     ],
-    "demo_xml" : [],
-    "installable" : True,
-    "certificate" : ''
+    "installable": True,
 }
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

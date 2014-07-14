@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 ##############################################################################
-#····
+#
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2010 Savoir-faire Linux (<http://www.savoirfairelinux.com>).
 #
@@ -18,25 +18,21 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.·····
 #
 ##############################################################################
+
 {
-    "name" : "Account tax halftax",
-    "version" : "1.0",
-    "author" : "Savoir-faire Linux",
-    "website" : "http://www.savoirfairelinux.com",
-    "category" : "Human Resources",
+    "name": "Account tax halftax",
+    "version": "1.0",
+    "author": "Savoir-faire Linux",
+    "website": "http://www.savoirfairelinux.com",
+    "category": "Human Resources",
     "description": """
         This module adds a boolean to account.account called 'tax_halftax'.
         If this boolean is set to true, then the amount of the tax has to be
         divided by 2.
     """,
-    "depends" : ['account'],
-    "init_xml" : [],
-    "update_xml" : [
+    "depends": ['account'],
+    "data": [
         'account_account_halftax.xml',
     ],
-    "demo_xml" : [],
-    "installable" : True,
-    "certificate" : ''
+    "installable": True,
 }
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
-

@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 ##############################################################################
-#····
+#
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2010 Savoir-faire Linux (<http://www.savoirfairelinux.com>).
 #
@@ -19,12 +19,11 @@
 #
 ##############################################################################
 
-from osv import osv, fields
+from osv import orm, fields
 
-class account_account(osv.osv):
+
+class account_account(orm.Model):
     _inherit = 'account.account'
     _columns = {
         'tax_halftax': fields.boolean('Divide tax by 2'),
     }
-
-account_account()

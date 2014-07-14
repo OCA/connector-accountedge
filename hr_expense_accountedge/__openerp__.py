@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 ##############################################################################
-#····
+#
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2010 Savoir-faire Linux (<http://www.savoirfairelinux.com>).
 #
@@ -18,6 +18,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.·····
 #
 ##############################################################################
+
 {
     "name": "Harmonization of expenses with AccountEdge",
     "version": "1.0",
@@ -39,13 +40,9 @@
         'account_account_halftax',
         'account_tax_accountedge'
         ],
-    "init_xml": [],
-    "update_xml": [
+    "data": [
         'hr_expense_accountedge.xml',
         'security/ir_rule.xml',
     ],
-    "demo_xml": [],
     "installable": True,
-    "certificate": ''
 }
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
