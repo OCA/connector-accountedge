@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 ##############################################################################
 #
-#    OpenERP, Open Source Management Solution
+#    Odoo, Open Source Management Solution
 #    Copyright (C) 2010 Savoir-faire Linux (<http://www.savoirfairelinux.com>).
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -22,32 +22,34 @@
 import time
 import base64
 
-from osv import orm, fields
 from datetime import datetime
+from openerp.osv import orm, fields
+from openerp.tools.translate import _
 
 
 class hr_expense_expense(orm.Model):
     _inherit = 'hr.expense.expense'
 
-    def _create_csv_report(self, cr, uid, ids, context={}):
+    def _create_csv_report(self, cr, uid, ids, context=None):
         res = {}
-        for id in ids:
-            this = self.browse(cr, uid, id)
-
-            output = this.employee_id.name
-            output += "\r\n"
-            output += "Employee\tCard ID\tDate\tVendor Invoice #\tAccount Number\tAmount\tDescription\
-                        \tTax Code\tCurrency Code\tExchange Rate\r\n"
+        for expense in self.browse(cr, uid, ids, context=context):
+            output = (
+                expense.employee_id.name +
+                "\r\n"
+                "Employee\tCard ID\tDate\tVendor Invoice #\tAccount Number\t"
+                "Amount\tDescription\tTax Code\tCurrency Code\tExchange Rate"
+                "\r\n"
+            )
             # Comment the previous line and uncomment the next one
-            # if you want to import taxes with their amount, instead of their code
-            # \tTax Code\tGST Amount\tPST/QST Amount\tCurrency Code\tExchange Rate\r\n"
+            # if you want to import taxes with their amount, instead of their
+            # code \tTax Code\tGST Amount\tPST/QST Amount\tCurrency Code\t
+            # Exchange Rate\r\n"
 
-            for l in this.line_ids:
+            for l in expense.line_ids:
                 taxes = self._compute_taxes(cr, uid, l, context)
-                # output  += u"%s\t%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%.2f\t%.2f\t%s\t%.2f\r\n" % (
                 output += u"%s\t%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%s\t%.2f\r\n" % (
-                    this.employee_id.name,
-                    this.employee_id.supplier_id_accountedge,
+                    expense.employee_id.name,
+                    expense.employee_id.supplier_id_accountedge,
                     datetime.today().strftime("%d-%m-%Y"),
                     l.expense_id.id,
                     l.account_id.code,
@@ -55,11 +57,13 @@ class hr_expense_expense(orm.Model):
                     l.name,
                     (l.tax_id.tax_code_accountedge or '000'),
                     # Comment the previous line and uncomment the next two ones
-                    # if you want to import taxes with their amount, instead of their code
+                    # if you want to import taxes with their amount, instead of
+                    # their code
                     # taxes['amount_gst'],
                     # taxes['amount_pst'],
                     (l.expense_id.currency_id.name or 'CAD'),
-                    (float(l.expense_id.currency_id.rate) or '1.0'))
+                    (float(l.expense_id.currency_id.rate) or '1.0')
+                )
 
             byte_string = output.encode('utf-8-sig')
             res[id] = base64.encodestring(byte_string)
@@ -73,8 +77,8 @@ class hr_expense_expense(orm.Model):
 
         res = {
             'amount_before_tax': expense_line.total_amount,
-            'amount_gst': 0.0,    # Goods and Services Tax, federal
-            'amount_pst': 0.0     # Provincial Sales Tax
+            'amount_gst': 0.0,  # Goods and Services Tax, federal
+            'amount_pst': 0.0,  # Provincial Sales Tax
         }
 
         tax = expense_line.tax_id
@@ -87,14 +91,18 @@ class hr_expense_expense(orm.Model):
             tax_factor = 0.5
 
         if tax.child_ids:
-            for child_tax in tax.child_ids:  # TODO: the detection of the two taxes should be more reliable
+            # TODO: the detection of the two taxes should be more reliable
+            for child_tax in tax.child_ids:
                 if 'TPS' in child_tax.name or 'GST' in child_tax.name:
                     res['amount_gst'] = float(child_tax.amount) * tax_factor
                 else:
                     res['amount_pst'] = float(child_tax.amount) * tax_factor
         else:
             res['amount_gst'] = float(tax.amount)
-        res['amount_before_tax'] = expense_line.total_amount / (1 + res['amount_gst'] + res['amount_pst'])
+        res['amount_before_tax'] = (
+            expense_line.total_amount /
+            (1 + res['amount_gst'] + res['amount_pst'])
+        )
         res['amount_gst'] = res['amount_before_tax'] * res['amount_gst']
         res['amount_pst'] = res['amount_before_tax'] * res['amount_pst']
         return res
@@ -123,8 +131,9 @@ class hr_expense_expense(orm.Model):
             this = self.browse(cr, uid, id)
             if not this.employee_id.supplier_id_accountedge:
                 raise orm.except_orm(
-                    'Accountedge Supplier ID missing',
-                    'Please add the Accountedge supplier ID on the employee before exporting the sheet.'
+                    _('Accountedge Supplier ID missing'),
+                    _('Please add the Accountedge supplier ID on the '
+                      'employee before exporting the sheet.')
                 )
             self._create_csv_report(cr, uid, ids, {})
             self.write(cr, uid, ids, {'state': 'exported'})
@@ -139,24 +148,32 @@ class hr_expense_expense(orm.Model):
 
     def _get_cur_account_manager(self, cr, uid, ids, field_name, arg, context):
         res = {}
+        users_pool = self.pool['res.users']
+        employee_pool = self.pool['hr.employee']
         for id in ids:
             emails = ''
             grp_ids = self.pool.get('res.groups').search(
                 cr, uid, [
                     ('name', '=', u'Manager'),
                     ('category_id.name', '=', u'Accounting & Finance')
-                ]
+                ], context=context
             )
-            usr_ids = self.pool.get('res.users').search(cr, uid, [('groups_id', '=', grp_ids[0])])
-            usrs = self.pool.get('res.users').browse(cr, uid, usr_ids)
+            usr_ids = users_pool.search(
+                cr, uid, [('groups_id', '=', grp_ids[0])], context=context
+            )
+            usrs = users_pool.browse(cr, uid, usr_ids, context=context)
 
             for user in usrs:
                 if user.user_email:
                     emails += user.user_email
                     emails += ','
                 else:
-                    empl_id = self.pool.get('hr.employee').search(cr, uid, [('login', '=', user.login)])[0]
-                    empl = self.pool.get('hr.employee').browse(cr, uid, empl_id)
+                    empl_id = employee_pool.search(
+                        cr, uid, [('login', '=', user.login)], context=context
+                    )[0]
+                    empl = employee_pool.browse(
+                        cr, uid, empl_id, context=context
+                    )
                     if empl.work_email:
                         emails += empl.work_email
                         emails += ','
@@ -165,22 +182,31 @@ class hr_expense_expense(orm.Model):
         return res
 
     _columns = {
-        'manager': fields.function(_get_cur_account_manager, string='Manager', type='char', size=128, readonly=True),
-        'state': fields.selection([
-            ('draft', 'New'),
-            ('confirm', 'Waiting Approval'),
-            ('accepted', 'Approved'),
-            ('exported', 'Exported'),
-            ('imported', 'Imported'),
-            ('cancelled', 'Refused'), ],
-            'State', readonly=True,
-            help="When the expense request is created the state is 'Draft'.\n"
-            "It is confirmed by the user and request is sent to admin, the state is 'Waiting Confirmation'.\n"
-            "If the admin accepts it, the state is 'Accepted'.\n"
-            "If the admin refuses it, the state is 'Refused'.\n"
-            "If a csv file has been generated for the expense request, the state is 'Exported'.\n"
-            "If the expense request has been imported in AccountEdge, the state is 'Imported'."
+        'manager': fields.function(
+            _get_cur_account_manager, string='Manager', type='char',
+            size=128, readonly=True
         ),
+        'state': fields.selection(
+            [
+                ('draft', 'New'),
+                ('confirm', 'Waiting Approval'),
+                ('accepted', 'Approved'),
+                ('exported', 'Exported'),
+                ('imported', 'Imported'),
+                ('cancelled', 'Refused'),
+            ],
+            'State',
+            readonly=True,
+            help="""\
+When the expense request is created the state is 'Draft'.
+It is confirmed by the user and request is sent to admin, the state is \
+'Waiting Confirmation'.
+If the admin accepts it, the state is 'Accepted'.
+If the admin refuses it, the state is 'Refused'.
+If a csv file has been generated for the expense request, the state is \
+'Exported'.
+If the expense request has been imported in AccountEdge, the state is \
+'Imported'."""),
     }
 
 
@@ -189,11 +215,17 @@ class hr_expense_line(orm.Model):
 
     def _get_parent_state(self, cr, uid, ids, field_name, arg, context):
         res = {}
-        for id in ids:
-            expense_line = self.pool.get('hr.expense.line').browse(cr, uid, id)
-            res[id] = expense_line.expense_id.state
+        line_pool = self.pool['hr.expense.line']
+        for expense_line in line_pool.browse(cr, uid, ids, context=context):
+            res[expense_line.id] = expense_line.expense_id.state
         return res
 
     _columns = {
-        'state': fields.function(_get_parent_state, string='Expense State', type='char', size=128, readonly=True),
+        'state': fields.function(
+            _get_parent_state,
+            string='Expense State',
+            type='char',
+            size=128,
+            readonly=True,
+        ),
     }
