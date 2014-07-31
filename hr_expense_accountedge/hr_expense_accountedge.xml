@@ -46,6 +46,7 @@
             <field name="model">hr.expense.expense</field>
             <field name="inherit_id" ref="hr_expense.view_expenses_form"/>
             <field name="arch" type="xml">
+
                 <field name="state"  position="replace">
                      <field name="state" widget="statusbar" statusbar_visible="draft,confirm,accepted,exported,imported" statusbar_colors='{"confirm":"blue","cancelled":"red"}'/>
                 </field>
@@ -58,16 +59,14 @@
                     <attribute name="attrs">{'readonly':[('state','in',['confirm','cancelled','exported','imported'])]}</attribute>
                 </field>
 
-                <group col="6" colspan="2" position="replace">
-                    <group col="6" colspan="2">
-                        <button name="draft" states="confirm,cancelled,exported" string="Set to Draft" type="workflow" icon="gtk-convert" groups="base.group_hr_user"/>
-                        <button name="refuse" states="confirm,accepted" string="Refuse" type="workflow" icon="gtk-no" groups="base.group_hr_user" />
-                        <button name="confirm" states="draft" string="Submit to Manager" type="workflow" icon="gtk-apply"/>
-                        <button name="validate" states="confirm" string="Approve" type="workflow" icon="gtk-go-forward" groups="base.group_hr_user"/>
-                        <button name="action_exported" states="accepted" string="Export CSV" type="workflow" groups="account.group_account_manager,account.group_account_invoice"/>
-                        <button name="action_imported" states="exported" confirm="This action cannot be undone" string="Mark as imported" type="workflow" groups="account.group_account_manager,account.group_account_invoice"/>
-                    </group>
-                </group>
+                <button name="draft" position="attributes">
+                    <attribute name="states">confirm,cancelled,exported</attribute>
+                </button>
+
+                <button name="draft" position="after">
+                    <button name="action_exported" states="accepted" string="Export CSV" type="workflow" groups="account.group_account_manager,account.group_account_invoice"/>
+                    <button name="action_imported" states="exported" confirm="This action cannot be undone" string="Mark as imported" type="workflow" groups="account.group_account_manager,account.group_account_invoice"/>
+                </button>
 
                 <field name="product_id" position="attributes">
                     <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
@@ -93,11 +92,11 @@
                     <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
                 </field>
 
-                <xpath expr="//page/field/form/group/field[@name='ref']" position="attributes">
+                <xpath expr="//page/field/form/group/group/field[@name='ref']" position="attributes">
                     <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
                 </xpath>
 
-                <xpath expr="//page/field/form/group/field[@name='name']" position="attributes">
+                <xpath expr="//page/field/form/group/group/field[@name='name']" position="attributes">
                     <attribute name="attrs">{'readonly':[('state','in',['confirm','accepted','cancelled','exported','imported'])]}</attribute>
                 </xpath>
 
