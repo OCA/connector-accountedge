@@ -6,7 +6,7 @@
             <field name="model">account.account</field>
             <field name="inherit_id" ref="account.view_account_form"/>
             <field name="arch" type="xml">
-                <field name="code" position="after">
+                <field name="reconcile" position="after">
                     <field name="tax_halftax"/>
                 </field>
             </field>
