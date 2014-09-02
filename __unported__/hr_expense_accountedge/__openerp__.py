@@ -20,17 +20,29 @@
 ##############################################################################
 
 {
-    "name": "Account id on expense line",
+    "name": "Harmonization of expenses with AccountEdge",
     "version": "1.0",
     "author": "Savoir-faire Linux",
     "website": "http://www.savoirfairelinux.com",
     "category": "Human Resources",
     "description": """
-        This module adds the account id field to hr.expense.line
+        This module generates the csv reports for the exportation
+        of expenses in AccountEdge.
+        It also modifies the workflow of the expenses.
     """,
-    "depends": ['hr_expense'],
+    "depends": [
+        'l10n_ca',
+        'hr_employee_accountedge',
+        'hr_expense_line_supplier',
+        'hr_expense_line_supplier_tax',
+        'hr_expense_line_account',
+        'hr_expense_line_sequence',
+        'account_account_halftax',
+        'account_tax_accountedge'
+        ],
     "data": [
-        'hr_expense_line_account.xml',
+        'hr_expense_accountedge.xml',
+        'security/ir_rule.xml',
     ],
-    "installable": True,
+    'installable': False,
 }

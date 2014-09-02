@@ -20,29 +20,18 @@
 ##############################################################################
 
 {
-    "name": "Harmonization of expenses with AccountEdge",
+    "name": "Supplier id on expense line",
     "version": "1.0",
     "author": "Savoir-faire Linux",
     "website": "http://www.savoirfairelinux.com",
     "category": "Human Resources",
     "description": """
-        This module generates the csv reports for the exportation
-        of expenses in AccountEdge.
-        It also modifies the workflow of the expenses.
+        This module adds the 'supplier_id_accountedge' field to the
+        hr.employee model.
     """,
-    "depends": [
-        'l10n_ca',
-        'hr_employee_accountedge',
-        'hr_expense_line_supplier',
-        'hr_expense_line_supplier_tax',
-        'hr_expense_line_account',
-        'hr_expense_line_sequence',
-        'account_account_halftax',
-        'account_tax_accountedge'
-        ],
+    "depends": ['hr_expense'],
     "data": [
-        'hr_expense_accountedge.xml',
-        'security/ir_rule.xml',
+        'hr_employee_accountedge.xml',
     ],
-    "installable": True,
+    'installable': False,
 }

@@ -20,17 +20,17 @@
 ##############################################################################
 
 {
-    "name": "Sequence on expense line",
+    "name": "Account id on expense line",
     "version": "1.0",
     "author": "Savoir-faire Linux",
     "website": "http://www.savoirfairelinux.com",
     "category": "Human Resources",
     "description": """
-        This module adds a sequence number field on the expense line.
+        This module adds the account id field to hr.expense.line
     """,
     "depends": ['hr_expense'],
     "data": [
-        'hr_expense_line_sequence.xml',
+        'hr_expense_line_account.xml',
     ],
-    "installable": True,
+    'installable': False,
 }

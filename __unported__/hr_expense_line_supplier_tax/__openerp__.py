@@ -20,18 +20,17 @@
 ##############################################################################
 
 {
-    "name": "Supplier id on expense line",
+    "name": "Supplier tax id on hr.expense.line",
     "version": "1.0",
     "author": "Savoir-faire Linux",
     "website": "http://www.savoirfairelinux.com",
     "category": "Human Resources",
     "description": """
-        This module adds the 'supplier_id_accountedge' field to the
-        hr.employee model.
+        This module adds the supplier tax id field to hr.expense.line
     """,
-    "depends": ['hr_expense'],
+    "depends": ['hr_expense', 'hr_expense_line_supplier'],
     "data": [
-        'hr_employee_accountedge.xml',
+        'hr_expense_line_supplier_tax.xml',
     ],
-    "installable": True,
+    'installable': False,
 }

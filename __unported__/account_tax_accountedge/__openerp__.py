@@ -20,19 +20,17 @@
 ##############################################################################
 
 {
-    "name": "Account tax halftax",
+    "name": "AccountEdge tax code",
     "version": "1.0",
     "author": "Savoir-faire Linux",
     "website": "http://www.savoirfairelinux.com",
     "category": "Human Resources",
     "description": """
-        This module adds a boolean to account.account called 'tax_halftax'.
-        If this boolean is set to true, then the amount of the tax has to be
-        divided by 2.
+        This module adds the AccountEdge tax code field to account.tax
     """,
-    "depends": ['account'],
+    "depends": ['account', 'account_accountant'],
     "data": [
-        'account_account_halftax.xml',
+        'account_tax_accountedge.xml',
     ],
-    "installable": True,
+    'installable': False,
 }
