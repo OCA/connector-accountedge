@@ -73,7 +73,9 @@ class hr_expense_expense(orm.Model):
 
         return True
 
-    def _compute_taxes(self, cr, uid, expense_line, context={}):
+    def _compute_taxes(self, cr, uid, expense_line, context=None):
+        if context is None:
+            context = self.pool['res.users'].context_get(cr, uid)
 
         res = {
             'amount_before_tax': expense_line.total_amount,
@@ -107,7 +109,9 @@ class hr_expense_expense(orm.Model):
         res['amount_pst'] = res['amount_before_tax'] * res['amount_pst']
         return res
 
-    def _add_attachment(self, cr, uid, ids, content, context={}):
+    def _add_attachment(self, cr, uid, ids, content, context=None):
+        if context is None:
+            context = self.pool['res.users'].context_get(cr, uid)
 
         file_name = 'export_'+time.strftime('%Y%m%d_%H%M%S')+'.tsv'
         self.pool.get('ir.attachment').create(cr, uid, {
