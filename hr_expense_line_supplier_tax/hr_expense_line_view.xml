@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+    <record id="view_expenses_line_tree" model="ir.ui.view">
+      <field name="model">hr.expense.line</field>
+      <field name="inherit_id" ref="hr_expense.view_expenses_line_tree"/>
+      <field name="arch" type="xml">
+
+        <field name="unit_amount" position="before">
+          <field name="tax_id" groups="account.group_account_invoice"/>
+        </field>
+
+      </field>
+    </record>
+
+  </data>
+</openerp>

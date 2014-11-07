@@ -33,7 +33,8 @@ class hr_expense_line(orm.Model):
         if not product_id:
             return None
         # Retrieve the product
-        product = self.pool.get('product.product').browse(cr, uid, product_id, context=context)
+        product_pool = self.pool['product.product']
+        product = product_pool.browse(cr, uid, product_id, context=context)
         # Product -> Accounting -> Expense account
         exp_acc = product.product_tmpl_id.property_account_expense
 
@@ -50,13 +51,16 @@ class hr_expense_line(orm.Model):
         return None
 
     def create(self, cr, user, vals, context=None):
-        """Overwrite the create() function to automatically set the default account id
-        since regular employees cannot access this field.
+        """Overwrite the create() function to automatically set the default
+        account id since regular employees cannot access this field.
         """
-        vals['account_id'] = self.get_account_id(cr, user, vals['product_id'], context)
+        vals['account_id'] = self.get_account_id(
+            cr, user, vals['product_id'], context=context
+        )
         return super(hr_expense_line, self).create(cr, user, vals, context)
 
-    def onchange_product_id(self, cr, uid, ids, product_id, uom_id, employee_id, context=None):
+    def onchange_product_id(
+            self, cr, uid, ids, product_id, uom_id, employee_id, context=None):
         res = super(hr_expense_line, self).onchange_product_id(
             cr, uid, ids, product_id, uom_id, employee_id, context=context
         )

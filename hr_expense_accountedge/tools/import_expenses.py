@@ -31,19 +31,24 @@ def main():
     server_url = 'http://localhost:8069'
     csv_path = 'hr_expense_accountedge.txt'
 
-    pwd = getpass.getpass(prompt="Please enter the password of %s: " % username)
+    pwd = getpass.getpass(
+        prompt="Please enter the password of %s: " % username
+    )
     # Get the uid
     sock_common = xmlrpclib.ServerProxy('%s/xmlrpc/common' % server_url)
     uid = sock_common.login(dbname, username, pwd)
     if not uid:
-        print("Connection error. Please check the username, password and server url.")
+        print("Connection error. Please check the username, password and "
+              "server url.")
         raw_input("Type 'enter' to quit...")
         return 1
     # Replace localhost with the address of the server
     sock = xmlrpclib.ServerProxy('%s/xmlrpc/object' % server_url)
     # Search for exported expense notes
     args = [('state', '=', 'exported')]
-    expense_ids = sock.execute(dbname, uid, pwd, 'hr.expense.expense', 'search', args)
+    expense_ids = sock.execute(
+        dbname, uid, pwd, 'hr.expense.expense', 'search', args
+    )
     print("There are %d expense sheets to import" % len(expense_ids))
     if not expense_ids:
         raw_input("Type 'enter' to quit...")
@@ -54,10 +59,17 @@ def main():
 
     # For each exported expense note, search for the tsv attachment
     for expense_id in expense_ids:
-        args = [('res_model', '=', 'hr.expense.expense'), ('res_id', '=', expense_id)]
-        csv_ids = sock.execute(dbname, uid, pwd, 'ir.attachment', 'search', args)
+        args = [
+            ('res_model', '=', 'hr.expense.expense'),
+            ('res_id', '=', expense_id),
+        ]
+        csv_ids = sock.execute(
+            dbname, uid, pwd, 'ir.attachment', 'search', args
+        )
         fields = ['name', 'datas']
-        csv_obj = sock.execute(dbname, uid, pwd, 'ir.attachment', 'read', csv_ids, fields)
+        csv_obj = sock.execute(
+            dbname, uid, pwd, 'ir.attachment', 'read', csv_ids, fields
+        )
         latest_csv = None
         latest_date = datetime(2000, 1, 1, 0, 0, 0)
         # Find the latest csv
@@ -78,7 +90,10 @@ def main():
             num_expense = num_expense + 1
         # Mark the expenses as imported
         values = {'state': 'exported'}
-        sock.execute(dbname, uid, pwd, 'hr.expense.expense', 'write', expense_ids, values)
+        sock.execute(
+            dbname, uid, pwd, 'hr.expense.expense', 'write', expense_ids,
+            values,
+        )
     final_csv.close()
     raw_input("Type 'enter' to quit...")
 

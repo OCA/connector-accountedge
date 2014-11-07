@@ -6,6 +6,7 @@ python:
 env:
   - VERSION="7.0" ODOO_REPO="odoo/odoo"
   - VERSION="7.0" ODOO_REPO="OCA/OCB"
+  - VERSION="7.0" UNIT_TEST="1"
 
 virtualenv:
   system_site_packages: true
@@ -14,10 +15,11 @@ install:
   - git clone https://github.com/OCA/maintainer-quality-tools.git ${HOME}/maintainer-quality-tools
   - export PATH=${HOME}/maintainer-quality-tools/travis:${PATH}
   - travis_install_nightly
+  - git clone https://github.com/OCA/l10n-canada ${HOME}/l10n-canada -b ${VERSION}
+  - sudo pip install num2words
 
 script:
-  - travis_run_flake8
   - travis_run_tests
 
 after_success:
-  coveralls
+  - coveralls
