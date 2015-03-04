@@ -24,6 +24,7 @@
     "version": "1.0",
     "author": "Savoir-faire Linux,Odoo Community Association (OCA)",
     "website": "http://www.savoirfairelinux.com",
+    "license": "GPL-3 or any later version",
     "category": "Human Resources",
     "description": """
         This module adds a sequence number field on the expense line.
