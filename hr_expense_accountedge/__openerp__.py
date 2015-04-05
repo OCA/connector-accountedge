@@ -39,7 +39,7 @@
         'hr_expense_line_sequence',
         'account_account_halftax',
         'account_tax_accountedge'
-        ],
+    ],
     "data": [
         'hr_expense_accountedge.xml',
         'security/ir_rule.xml',

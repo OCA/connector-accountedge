@@ -113,14 +113,14 @@ class hr_expense_expense(orm.Model):
         if context is None:
             context = self.pool['res.users'].context_get(cr, uid)
 
-        file_name = 'export_'+time.strftime('%Y%m%d_%H%M%S')+'.tsv'
+        file_name = 'export_' + time.strftime('%Y%m%d_%H%M%S') + '.tsv'
         self.pool.get('ir.attachment').create(cr, uid, {
             'name': file_name,
             'datas': base64.encodestring(content),
             'datas_fname': file_name,
             'res_model': self._name,
             'res_id': ids,
-            },
+        },
             context=context
         )
         return True
