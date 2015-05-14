@@ -22,7 +22,7 @@ install:
   - export PATH=${HOME}/maintainer-quality-tools/travis:${PATH}
   - travis_install_nightly
   - git clone https://github.com/OCA/l10n-canada ${HOME}/l10n-canada -b ${VERSION}
-  - sudo pip install num2words
+  - pip install num2words
 
 script:
   - travis_run_tests
