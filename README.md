@@ -5,5 +5,3 @@ Connector AccountEdge
 =====================
 
 Odoo modules to integrate with [AccountEdge](http://ca.accountedge.com), also known as MyOB.
-
-
